@@ -19,6 +19,18 @@ import type { WorkerMessage, WorkerResponse } from '../workers/backgroundRemoval
 
 export type ProgressCallback = (progress: number) => void;
 
+/**
+ * Detect if we should use CPU processing (more stable on mobile).
+ */
+function shouldUseCpu(): boolean {
+    // Check for mobile device indicators
+    const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const hasLowMemory = 'deviceMemory' in navigator && (navigator as { deviceMemory?: number }).deviceMemory !== undefined && (navigator as { deviceMemory?: number }).deviceMemory! < 4;
+    const isSmallScreen = typeof window !== 'undefined' && window.innerWidth <= 768;
+    
+    return mobileUserAgent || hasLowMemory || isSmallScreen;
+}
+
 class BackgroundRemovalService {
     private worker: Worker | null = null;
     private isPreloaded = false;
@@ -78,7 +90,7 @@ class BackgroundRemovalService {
             worker.addEventListener('message', handleMessage);
             worker.addEventListener('error', handleError);
 
-            const message: WorkerMessage = { type: 'preload' };
+            const message: WorkerMessage = { type: 'preload', useCpu: shouldUseCpu() };
             worker.postMessage(message);
         });
 
@@ -159,6 +171,7 @@ class BackgroundRemovalService {
                 type: 'process',
                 imageData: arrayBuffer,
                 mimeType,
+                useCpu: shouldUseCpu(),
             };
             worker.postMessage(message, [arrayBuffer]);
         });

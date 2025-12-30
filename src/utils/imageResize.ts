@@ -23,8 +23,10 @@ export const MAX_IMAGE_DIMENSION = 4096;
 /**
  * Maximum dimension for mobile devices to prevent out-of-memory crashes.
  * Mobile devices have significantly less memory available for processing.
+ * Using 1024px to be very conservative - the AI model + canvas operations
+ * can easily consume 500MB+ of RAM on larger images.
  */
-export const MAX_IMAGE_DIMENSION_MOBILE = 2048;
+export const MAX_IMAGE_DIMENSION_MOBILE = 1024;
 
 /**
  * Threshold for showing a warning about large images.
@@ -43,7 +45,10 @@ export function isMobileDevice(): boolean {
     // Also check user agent for mobile keywords
     const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
-    return (hasTouchScreen && isSmallScreen) || mobileUserAgent;
+    // Check if device memory is low (if available)
+    const hasLowMemory = 'deviceMemory' in navigator && (navigator as { deviceMemory?: number }).deviceMemory !== undefined && (navigator as { deviceMemory?: number }).deviceMemory! < 4;
+    
+    return (hasTouchScreen && isSmallScreen) || mobileUserAgent || hasLowMemory;
 }
 
 /**

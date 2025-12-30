@@ -20,6 +20,7 @@ export interface WorkerMessage {
     type: 'process' | 'preload';
     imageData?: ArrayBuffer;
     mimeType?: string;
+    useCpu?: boolean; // Force CPU processing for mobile devices
 }
 
 export interface WorkerResponse {
@@ -31,6 +32,7 @@ export interface WorkerResponse {
 
 // Track if model is already loaded to avoid re-downloading
 let isModelLoaded = false;
+let currentDevice: 'gpu' | 'cpu' = 'gpu';
 
 // Track loading progress across multiple files
 interface FileProgress {
@@ -54,7 +56,7 @@ function calculateOverallProgress(): number {
 }
 
 // Shared config for consistent behavior - model stays cached after first load
-const getConfig = (onProgress?: (progress: number) => void): Config => ({
+const getConfig = (onProgress?: (progress: number) => void, useCpu?: boolean): Config => ({
     progress: (key: string, current: number, total: number) => {
         if (total > 0) {
             fileProgressMap.set(key, { current, total });
@@ -63,15 +65,19 @@ const getConfig = (onProgress?: (progress: number) => void): Config => ({
         }
     },
     debug: false,
-    device: 'gpu', // Use WebGPU if available, falls back to CPU automatically
+    device: useCpu ? 'cpu' : 'gpu', // Use CPU on mobile to avoid WebGPU memory issues
+    output: {
+        format: 'image/png',
+        quality: 0.8, // Slightly reduce quality to save memory
+    },
 });
 
 self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
-    const { type, imageData, mimeType } = event.data;
+    const { type, imageData, mimeType, useCpu } = event.data;
 
     if (type === 'preload') {
-        // Skip if already loaded
-        if (isModelLoaded) {
+        // Skip if already loaded with same device setting
+        if (isModelLoaded && currentDevice === (useCpu ? 'cpu' : 'gpu')) {
             const response: WorkerResponse = { type: 'preload-complete' };
             self.postMessage(response);
             return;
@@ -79,13 +85,14 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
         
         // Clear progress map for fresh preload
         fileProgressMap.clear();
+        currentDevice = useCpu ? 'cpu' : 'gpu';
         
         // Preload WASM and ONNX model files
         try {
             const config = getConfig((progress) => {
                 const response: WorkerResponse = { type: 'progress', progress };
                 self.postMessage(response);
-            });
+            }, useCpu);
 
             await preload(config);
             isModelLoaded = true;
@@ -111,11 +118,12 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
             const config = getConfig((progress) => {
                 const response: WorkerResponse = { type: 'progress', progress };
                 self.postMessage(response);
-            });
+            }, useCpu);
 
             // Process the image - model will be cached from preload or loaded on first use
             const resultBlob = await removeBackground(blob, config);
             isModelLoaded = true; // Model is definitely loaded after processing
+            currentDevice = useCpu ? 'cpu' : 'gpu';
             
             // Convert Blob to ArrayBuffer for transfer
             const resultBuffer = await resultBlob.arrayBuffer();
