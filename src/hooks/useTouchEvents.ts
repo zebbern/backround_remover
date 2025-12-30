@@ -41,6 +41,8 @@ interface UseTouchEventsProps {
 const SCROLL_THRESHOLD = 10;
 // If vertical movement is this much greater than horizontal, it's a scroll
 const SCROLL_RATIO = 1.5;
+// Delay before applying smart selection after last touch (ms) - allows for quick multi-stroke painting
+const PAINT_END_DEBOUNCE = 600;
 
 // Calculate distance between two touch points
 function getTouchDistance(touch1: React.Touch, touch2: React.Touch): number {
@@ -78,8 +80,33 @@ export function useTouchEvents({
     });
 
     const [isTouching, setIsTouching] = useState(false);
+    const paintEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const hasPaintedRef = useRef(false);
+
+    // Cancel any pending paint end timer
+    const cancelPaintEndTimer = useCallback(() => {
+        if (paintEndTimerRef.current) {
+            clearTimeout(paintEndTimerRef.current);
+            paintEndTimerRef.current = null;
+        }
+    }, []);
+
+    // Schedule paint end with debounce - allows for quick multi-stroke painting
+    const schedulePaintEnd = useCallback(() => {
+        cancelPaintEndTimer();
+        paintEndTimerRef.current = setTimeout(() => {
+            if (hasPaintedRef.current) {
+                onPaintEnd();
+                hasPaintedRef.current = false;
+            }
+            paintEndTimerRef.current = null;
+        }, PAINT_END_DEBOUNCE);
+    }, [cancelPaintEndTimer, onPaintEnd]);
 
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        // Cancel any pending paint end - user is still painting
+        cancelPaintEndTimer();
+        
         const touches = e.touches;
 
         if (touches.length === 1) {
@@ -117,7 +144,7 @@ export function useTouchEvents({
             };
             setIsTouching(true);
         }
-    }, []);
+    }, [cancelPaintEndTimer]);
 
     const handleTouchMove = useCallback((e: React.TouchEvent) => {
         const touches = e.touches;
@@ -140,6 +167,7 @@ export function useTouchEvents({
             if (state.isPainting) {
                 e.preventDefault();
                 onPaintMove(touch.clientX, touch.clientY);
+                hasPaintedRef.current = true;
                 touchStateRef.current.lastTouchPos = { x: touch.clientX, y: touch.clientY };
                 return;
             }
@@ -160,6 +188,7 @@ export function useTouchEvents({
                     setIsTouching(true);
                     onPaintStart(state.startTouchPos.x, state.startTouchPos.y);
                     onPaintMove(touch.clientX, touch.clientY);
+                    hasPaintedRef.current = true;
                     touchStateRef.current.lastTouchPos = { x: touch.clientX, y: touch.clientY };
                 }
             }
@@ -197,8 +226,10 @@ export function useTouchEvents({
             e.preventDefault();
         }
 
+        // Schedule paint end with debounce - allows for quick multi-stroke painting
+        // The selection marks stay visible until user stops painting for 600ms
         if (state.isPainting) {
-            onPaintEnd();
+            schedulePaintEnd();
         }
 
         // Reset if no more touches
@@ -229,7 +260,7 @@ export function useTouchEvents({
             };
             // Don't start painting immediately, wait for movement
         }
-    }, [onPaintEnd]);
+    }, [schedulePaintEnd]);
 
     return {
         handleTouchStart,

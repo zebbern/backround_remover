@@ -29,7 +29,10 @@ export interface WorkerResponse {
     error?: string;
 }
 
-// Shared config for consistent behavior
+// Track if model is already loaded to avoid re-downloading
+let isModelLoaded = false;
+
+// Shared config for consistent behavior - model stays cached after first load
 const getConfig = (onProgress?: (key: string, current: number, total: number) => void): Config => ({
     progress: onProgress,
     debug: false,
@@ -40,6 +43,13 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
     const { type, imageData, mimeType } = event.data;
 
     if (type === 'preload') {
+        // Skip if already loaded
+        if (isModelLoaded) {
+            const response: WorkerResponse = { type: 'preload-complete' };
+            self.postMessage(response);
+            return;
+        }
+        
         // Preload WASM and ONNX model files
         try {
             const config = getConfig((_key, current, total) => {
@@ -51,6 +61,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
             });
 
             await preload(config);
+            isModelLoaded = true;
             
             const response: WorkerResponse = { type: 'preload-complete' };
             self.postMessage(response);
@@ -75,8 +86,9 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                 }
             });
 
-            // Process the image
+            // Process the image - model will be cached from preload or loaded on first use
             const resultBlob = await removeBackground(blob, config);
+            isModelLoaded = true; // Model is definitely loaded after processing
             
             // Convert Blob to ArrayBuffer for transfer
             const resultBuffer = await resultBlob.arrayBuffer();
