@@ -114,6 +114,7 @@ export const CanvasViewer: React.FC = () => {
         edgeRefinement,
         isCropping,
         cropRect,
+        hasPendingStrokes,
     });
 
     // Brush painting hook

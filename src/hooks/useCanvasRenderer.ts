@@ -30,6 +30,7 @@ interface UseCanvasRendererProps {
     edgeRefinement: EdgeRefinementSettings;
     isCropping?: boolean;
     cropRect?: CropRect | null;
+    hasPendingStrokes?: boolean;
 }
 
 export interface CanvasRefs {
@@ -51,6 +52,7 @@ export function useCanvasRenderer({
     edgeRefinement,
     isCropping = false,
     cropRect = null,
+    hasPendingStrokes = false,
 }: UseCanvasRendererProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const cursorCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -279,7 +281,8 @@ export function useCanvasRenderer({
         }
 
         // 3. Draw Selection Overlay (Top Layer)
-        if (sc && isDragging) {
+        // Show selection when actively dragging OR when there are pending strokes (manual mode)
+        if (sc && (isDragging || hasPendingStrokes)) {
             ctx.save();
             ctx.globalAlpha = 0.4;
             ctx.drawImage(sc, 0, 0);
@@ -352,7 +355,7 @@ export function useCanvasRenderer({
             
             ctx.restore();
         }
-    }, [imgObj, brushMode, isDragging, backgroundColor, bgImgObj, backgroundSize, featherRadius, shadowSettings, edgeRefinement, isCropping, cropRect]);
+    }, [imgObj, brushMode, isDragging, backgroundColor, bgImgObj, backgroundSize, featherRadius, shadowSettings, edgeRefinement, isCropping, cropRect, hasPendingStrokes]);
 
     return {
         canvasRef,
