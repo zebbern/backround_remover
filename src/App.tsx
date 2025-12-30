@@ -23,7 +23,7 @@ import { KeyboardShortcutsHelp } from './components/KeyboardShortcutsHelp';
 import { useAppStore } from './store/useAppStore';
 import { useBackgroundRemoval } from './hooks/useBackgroundRemoval';
 import { useModelPreload } from './hooks/useModelPreload';
-import { resizeImageIfNeeded, formatDimensions, MAX_IMAGE_DIMENSION } from './utils/imageResize';
+import { resizeImageIfNeeded, formatDimensions, getMaxDimension } from './utils/imageResize';
 import { toast } from './store/useToastStore';
 import { Github } from 'lucide-react';
 
@@ -67,7 +67,7 @@ function App() {
             });
             
             // Apply same resize logic as ImageUploader
-            const resizeResult = await resizeImageIfNeeded(dataUrl, MAX_IMAGE_DIMENSION);
+            const resizeResult = await resizeImageIfNeeded(dataUrl, getMaxDimension());
             
             if (resizeResult.wasResized) {
               toast.info(

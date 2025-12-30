@@ -32,9 +32,36 @@ export interface WorkerResponse {
 // Track if model is already loaded to avoid re-downloading
 let isModelLoaded = false;
 
+// Track loading progress across multiple files
+interface FileProgress {
+    current: number;
+    total: number;
+}
+const fileProgressMap = new Map<string, FileProgress>();
+
+function calculateOverallProgress(): number {
+    if (fileProgressMap.size === 0) return 0;
+    
+    let totalBytes = 0;
+    let loadedBytes = 0;
+    
+    for (const progress of fileProgressMap.values()) {
+        totalBytes += progress.total;
+        loadedBytes += progress.current;
+    }
+    
+    return totalBytes > 0 ? Math.round((loadedBytes / totalBytes) * 100) : 0;
+}
+
 // Shared config for consistent behavior - model stays cached after first load
-const getConfig = (onProgress?: (key: string, current: number, total: number) => void): Config => ({
-    progress: onProgress,
+const getConfig = (onProgress?: (progress: number) => void): Config => ({
+    progress: (key: string, current: number, total: number) => {
+        if (total > 0) {
+            fileProgressMap.set(key, { current, total });
+            const overallProgress = calculateOverallProgress();
+            onProgress?.(overallProgress);
+        }
+    },
     debug: false,
     device: 'gpu', // Use WebGPU if available, falls back to CPU automatically
 });
@@ -50,14 +77,14 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
             return;
         }
         
+        // Clear progress map for fresh preload
+        fileProgressMap.clear();
+        
         // Preload WASM and ONNX model files
         try {
-            const config = getConfig((_key, current, total) => {
-                if (total > 0) {
-                    const percentage = Math.round((current / total) * 100);
-                    const response: WorkerResponse = { type: 'progress', progress: percentage };
-                    self.postMessage(response);
-                }
+            const config = getConfig((progress) => {
+                const response: WorkerResponse = { type: 'progress', progress };
+                self.postMessage(response);
             });
 
             await preload(config);
@@ -78,12 +105,12 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
             // Convert ArrayBuffer back to Blob
             const blob = new Blob([imageData], { type: mimeType });
 
-            const config = getConfig((_key, current, total) => {
-                if (total > 0) {
-                    const percentage = Math.round((current / total) * 100);
-                    const response: WorkerResponse = { type: 'progress', progress: percentage };
-                    self.postMessage(response);
-                }
+            // Clear progress map for fresh processing (in case model needs to load)
+            fileProgressMap.clear();
+            
+            const config = getConfig((progress) => {
+                const response: WorkerResponse = { type: 'progress', progress };
+                self.postMessage(response);
             });
 
             // Process the image - model will be cached from preload or loaded on first use

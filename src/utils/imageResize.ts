@@ -21,9 +21,37 @@
 export const MAX_IMAGE_DIMENSION = 4096;
 
 /**
+ * Maximum dimension for mobile devices to prevent out-of-memory crashes.
+ * Mobile devices have significantly less memory available for processing.
+ */
+export const MAX_IMAGE_DIMENSION_MOBILE = 2048;
+
+/**
  * Threshold for showing a warning about large images.
  */
 export const LARGE_IMAGE_THRESHOLD = 2048;
+
+/**
+ * Detect if the current device is a mobile device.
+ * Uses multiple signals for reliable detection.
+ */
+export function isMobileDevice(): boolean {
+    // Check for touch capability + small screen (most reliable for actual mobile)
+    const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = window.innerWidth <= 768;
+    
+    // Also check user agent for mobile keywords
+    const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    return (hasTouchScreen && isSmallScreen) || mobileUserAgent;
+}
+
+/**
+ * Get the appropriate max dimension based on device type.
+ */
+export function getMaxDimension(): number {
+    return isMobileDevice() ? MAX_IMAGE_DIMENSION_MOBILE : MAX_IMAGE_DIMENSION;
+}
 
 export interface ImageDimensions {
     width: number;

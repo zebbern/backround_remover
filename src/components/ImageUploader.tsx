@@ -18,7 +18,7 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
-import { resizeImageIfNeeded, formatDimensions, MAX_IMAGE_DIMENSION } from '../utils/imageResize';
+import { resizeImageIfNeeded, formatDimensions, getMaxDimension } from '../utils/imageResize';
 import { toast } from '../store/useToastStore';
 import clsx from 'clsx';
 
@@ -57,7 +57,7 @@ export const ImageUploader: React.FC = () => {
                 setIsResizing(true);
                 
                 // Check if image needs resizing
-                const resizeResult = await resizeImageIfNeeded(result, MAX_IMAGE_DIMENSION);
+                const resizeResult = await resizeImageIfNeeded(result, getMaxDimension());
                 
                 if (resizeResult.wasResized) {
                     toast.info(
