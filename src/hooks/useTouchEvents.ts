@@ -20,8 +20,11 @@ interface TouchState {
     isPainting: boolean;
     isPanning: boolean;
     isPinching: boolean;
+    isScrolling: boolean;
     lastTouchPos: { x: number; y: number };
+    startTouchPos: { x: number; y: number };
     lastPinchDistance: number;
+    touchStartTime: number;
 }
 
 interface UseTouchEventsProps {
@@ -33,6 +36,11 @@ interface UseTouchEventsProps {
     onPaintMove: (x: number, y: number) => void;
     onPaintEnd: () => void;
 }
+
+// Minimum movement to determine scroll vs paint intent (in pixels)
+const SCROLL_THRESHOLD = 10;
+// If vertical movement is this much greater than horizontal, it's a scroll
+const SCROLL_RATIO = 1.5;
 
 // Calculate distance between two touch points
 function getTouchDistance(touch1: React.Touch, touch2: React.Touch): number {
@@ -62,30 +70,35 @@ export function useTouchEvents({
         isPainting: false,
         isPanning: false,
         isPinching: false,
+        isScrolling: false,
         lastTouchPos: { x: 0, y: 0 },
+        startTouchPos: { x: 0, y: 0 },
         lastPinchDistance: 0,
+        touchStartTime: 0,
     });
 
     const [isTouching, setIsTouching] = useState(false);
 
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
-        e.preventDefault();
         const touches = e.touches;
 
         if (touches.length === 1) {
-            // Single finger = paint
+            // Single finger - don't prevent default yet, wait to determine intent
             const touch = touches[0];
             touchStateRef.current = {
                 ...touchStateRef.current,
-                isPainting: true,
+                isPainting: false, // Don't start painting immediately
                 isPanning: false,
                 isPinching: false,
+                isScrolling: false,
                 lastTouchPos: { x: touch.clientX, y: touch.clientY },
+                startTouchPos: { x: touch.clientX, y: touch.clientY },
+                touchStartTime: Date.now(),
             };
-            setIsTouching(true);
-            onPaintStart(touch.clientX, touch.clientY);
+            // Don't set isTouching or call onPaintStart yet
         } else if (touches.length === 2) {
-            // Two fingers = pinch zoom or pan
+            // Two fingers = pinch zoom or pan - prevent default for this
+            e.preventDefault();
             const touch1 = touches[0];
             const touch2 = touches[1];
             const distance = getTouchDistance(touch1, touch2);
@@ -96,25 +109,64 @@ export function useTouchEvents({
                 isPainting: false,
                 isPanning: true,
                 isPinching: true,
+                isScrolling: false,
                 lastTouchPos: center,
+                startTouchPos: center,
                 lastPinchDistance: distance,
+                touchStartTime: Date.now(),
             };
             setIsTouching(true);
         }
-    }, [onPaintStart]);
+    }, []);
 
     const handleTouchMove = useCallback((e: React.TouchEvent) => {
-        e.preventDefault();
         const touches = e.touches;
         const state = touchStateRef.current;
 
-        if (touches.length === 1 && state.isPainting) {
-            // Single finger painting
+        if (touches.length === 1) {
             const touch = touches[0];
-            onPaintMove(touch.clientX, touch.clientY);
-            touchStateRef.current.lastTouchPos = { x: touch.clientX, y: touch.clientY };
+            const dx = touch.clientX - state.startTouchPos.x;
+            const dy = touch.clientY - state.startTouchPos.y;
+            const absDx = Math.abs(dx);
+            const absDy = Math.abs(dy);
+            const totalMovement = Math.sqrt(dx * dx + dy * dy);
+
+            // If we're already scrolling, let the browser handle it
+            if (state.isScrolling) {
+                return; // Don't prevent default, allow native scroll
+            }
+
+            // If we're already painting, continue painting
+            if (state.isPainting) {
+                e.preventDefault();
+                onPaintMove(touch.clientX, touch.clientY);
+                touchStateRef.current.lastTouchPos = { x: touch.clientX, y: touch.clientY };
+                return;
+            }
+
+            // Determine intent based on movement direction
+            if (totalMovement > SCROLL_THRESHOLD) {
+                // Check if movement is predominantly vertical (scroll intent)
+                if (absDy > absDx * SCROLL_RATIO) {
+                    // Vertical movement - user wants to scroll
+                    touchStateRef.current.isScrolling = true;
+                    setIsTouching(false);
+                    // Don't prevent default - allow native scroll
+                    return;
+                } else {
+                    // Horizontal or diagonal movement - user wants to paint
+                    e.preventDefault();
+                    touchStateRef.current.isPainting = true;
+                    setIsTouching(true);
+                    onPaintStart(state.startTouchPos.x, state.startTouchPos.y);
+                    onPaintMove(touch.clientX, touch.clientY);
+                    touchStateRef.current.lastTouchPos = { x: touch.clientX, y: touch.clientY };
+                }
+            }
+            // If movement is small, wait for more data
         } else if (touches.length === 2 && (state.isPanning || state.isPinching)) {
-            // Two finger pinch/pan
+            // Two finger pinch/pan - always prevent default
+            e.preventDefault();
             const touch1 = touches[0];
             const touch2 = touches[1];
             const newDistance = getTouchDistance(touch1, touch2);
@@ -135,11 +187,15 @@ export function useTouchEvents({
             touchStateRef.current.lastTouchPos = newCenter;
             touchStateRef.current.lastPinchDistance = newDistance;
         }
-    }, [zoom, pan, setZoom, setPan, onPaintMove]);
+    }, [zoom, pan, setZoom, setPan, onPaintStart, onPaintMove]);
 
     const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-        e.preventDefault();
         const state = touchStateRef.current;
+
+        // Only prevent default if we were painting/pinching (not scrolling)
+        if (state.isPainting || state.isPanning || state.isPinching) {
+            e.preventDefault();
+        }
 
         if (state.isPainting) {
             onPaintEnd();
@@ -151,23 +207,29 @@ export function useTouchEvents({
                 isPainting: false,
                 isPanning: false,
                 isPinching: false,
+                isScrolling: false,
                 lastTouchPos: { x: 0, y: 0 },
+                startTouchPos: { x: 0, y: 0 },
                 lastPinchDistance: 0,
+                touchStartTime: 0,
             };
             setIsTouching(false);
-        } else if (e.touches.length === 1) {
-            // Switched from two fingers to one - start painting
+        } else if (e.touches.length === 1 && !state.isScrolling) {
+            // Switched from two fingers to one - prepare for potential painting
             const touch = e.touches[0];
             touchStateRef.current = {
-                isPainting: true,
+                isPainting: false,
                 isPanning: false,
                 isPinching: false,
+                isScrolling: false,
                 lastTouchPos: { x: touch.clientX, y: touch.clientY },
+                startTouchPos: { x: touch.clientX, y: touch.clientY },
                 lastPinchDistance: 0,
+                touchStartTime: Date.now(),
             };
-            onPaintStart(touch.clientX, touch.clientY);
+            // Don't start painting immediately, wait for movement
         }
-    }, [onPaintStart, onPaintEnd]);
+    }, [onPaintEnd]);
 
     return {
         handleTouchStart,
