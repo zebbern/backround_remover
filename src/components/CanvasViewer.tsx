@@ -467,6 +467,21 @@ export const CanvasViewer: React.FC = () => {
                 aria-label={`Image editor canvas. ${isCropping ? 'Crop mode active. Press Enter to apply, Escape to cancel.' : `${brushMode === 'erase' ? 'Erase' : 'Restore'} mode active. Press E for erase, R for restore.`}`}
                 tabIndex={0}
             >
+                {/* Checkerboard Background - Fixed size, doesn't scale with zoom */}
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                        backgroundImage: `
+                            linear-gradient(45deg, #18181b 25%, transparent 25%), 
+                            linear-gradient(-45deg, #18181b 25%, transparent 25%), 
+                            linear-gradient(45deg, transparent 75%, #18181b 75%), 
+                            linear-gradient(-45deg, transparent 75%, #18181b 75%)
+                        `,
+                        backgroundSize: '16px 16px',
+                        backgroundPosition: '0 0, 0 8px, 8px -8px, -8px 0px',
+                    }}
+                />
+
                 <div
                     style={{
                         transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
@@ -475,21 +490,6 @@ export const CanvasViewer: React.FC = () => {
                     }}
                     className="w-full h-full flex items-center justify-center"
                 >
-                    {/* Checkerboard Background - Dark Mode Optimized */}
-                    <div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                            backgroundImage: `
-                                linear-gradient(45deg, #18181b 25%, transparent 25%), 
-                                linear-gradient(-45deg, #18181b 25%, transparent 25%), 
-                                linear-gradient(45deg, transparent 75%, #18181b 75%), 
-                                linear-gradient(-45deg, transparent 75%, #18181b 75%)
-                            `,
-                            backgroundSize: '20px 20px',
-                            backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
-                        }}
-                    />
-
                     <canvas ref={canvasRef} className="relative z-10" />
                 </div>
 
