@@ -22,8 +22,10 @@ interface UseBrushPaintingProps {
     imgObj: HTMLImageElement | null;
     brushSize: number;
     brushMode: 'erase' | 'restore';
+    instantApply: boolean;
     render: () => void;
     addToHistory: (dataUrl: string) => void;
+    onPendingStrokesChange: (hasPending: boolean) => void;
 }
 
 // Helper: Color Distance
@@ -36,12 +38,15 @@ export function useBrushPainting({
     imgObj,
     brushSize,
     brushMode,
+    instantApply,
     render,
     addToHistory,
+    onPendingStrokesChange,
 }: UseBrushPaintingProps) {
     const { canvasRef, selectionCanvasRef, offscreenCanvasRef } = refs;
     const renderScheduledRef = useRef(false);
     const lastPointRef = useRef<{ x: number; y: number } | null>(null);
+    const hasStrokesRef = useRef(false);
 
     // Throttled render using requestAnimationFrame
     const scheduleRender = useCallback(() => {
@@ -87,19 +92,23 @@ export function useBrushPainting({
         }
         
         lastPointRef.current = { x, y };
+        
+        // Track that we have pending strokes
+        if (!hasStrokesRef.current) {
+            hasStrokesRef.current = true;
+            onPendingStrokesChange(true);
+        }
+        
         scheduleRender();
-    }, [canvasRef, selectionCanvasRef, imgObj, brushSize, brushMode, scheduleRender]);
+    }, [canvasRef, selectionCanvasRef, imgObj, brushSize, brushMode, scheduleRender, onPendingStrokesChange]);
 
     // Handle Painting Selection (mouse event wrapper)
     const paintSelection = useCallback((e: React.MouseEvent) => {
         paintSelectionAtPoint(e.clientX, e.clientY);
     }, [paintSelectionAtPoint]);
 
-    // Apply Smart Logic on Mouse Up
-    const applySmartSelection = useCallback(() => {
-        // Reset last point for next stroke
-        lastPointRef.current = null;
-        
+    // Core function to apply the marked strokes to the image
+    const commitStrokes = useCallback(() => {
         const osc = offscreenCanvasRef.current;
         const sc = selectionCanvasRef.current;
         const canvas = canvasRef.current;
@@ -179,15 +188,51 @@ export function useBrushPainting({
         // Clear selection canvas
         scCtx.clearRect(0, 0, width, height);
 
+        // Reset pending strokes state
+        hasStrokesRef.current = false;
+        onPendingStrokesChange(false);
+
         // Save history
         addToHistory(osc.toDataURL());
 
         render();
-    }, [canvasRef, offscreenCanvasRef, selectionCanvasRef, imgObj, brushMode, addToHistory, render]);
+    }, [canvasRef, offscreenCanvasRef, selectionCanvasRef, imgObj, brushMode, addToHistory, render, onPendingStrokesChange]);
+
+    // Clear strokes without applying (cancel)
+    const clearPendingStrokes = useCallback(() => {
+        const sc = selectionCanvasRef.current;
+        const canvas = canvasRef.current;
+        if (!sc || !canvas) return;
+
+        const scCtx = sc.getContext('2d');
+        if (!scCtx) return;
+
+        scCtx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        hasStrokesRef.current = false;
+        onPendingStrokesChange(false);
+        lastPointRef.current = null;
+        
+        render();
+    }, [selectionCanvasRef, canvasRef, onPendingStrokesChange, render]);
+
+    // Called on mouse/touch up - only auto-applies if instantApply is true
+    const applySmartSelection = useCallback(() => {
+        // Reset last point for next stroke
+        lastPointRef.current = null;
+        
+        // Only auto-apply if instant mode is enabled
+        if (instantApply) {
+            commitStrokes();
+        }
+        // Otherwise, keep the strokes visible for user to confirm
+    }, [instantApply, commitStrokes]);
 
     return {
         paintSelection,
         paintSelectionAtPoint,
         applySmartSelection,
+        commitStrokes,
+        clearPendingStrokes,
     };
 }

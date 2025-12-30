@@ -57,6 +57,8 @@ interface AppState {
     // Editing State
     brushSize: number;
     brushMode: 'erase' | 'restore';
+    instantApply: boolean; // If false, user must confirm brush strokes
+    hasPendingStrokes: boolean; // Whether there are uncommitted brush strokes
     zoom: number;
     pan: { x: number; y: number };
     featherRadius: number; // 0-20 feather/blur radius for edge softening
@@ -93,6 +95,8 @@ interface AppState {
 
     setBrushSize: (size: number) => void;
     setBrushMode: (mode: 'erase' | 'restore') => void;
+    setInstantApply: (instant: boolean) => void;
+    setHasPendingStrokes: (pending: boolean) => void;
     setZoom: (zoom: number) => void;
     setPan: (pan: { x: number; y: number }) => void;
     setFeatherRadius: (value: number) => void;
@@ -130,6 +134,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     brushSize: 50,
     brushMode: 'erase',
+    instantApply: false, // Default: require confirmation for brush strokes
+    hasPendingStrokes: false,
     zoom: 1,
     pan: { x: 0, y: 0 },
     featherRadius: 0,
@@ -200,6 +206,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     setBrushSize: (size) => set({ brushSize: size }),
     setBrushMode: (mode) => set({ brushMode: mode }),
+    setInstantApply: (instant) => set({ instantApply: instant }),
+    setHasPendingStrokes: (pending) => set({ hasPendingStrokes: pending }),
     setZoom: (zoom) => set({ zoom }),
     setPan: (pan) => set({ pan }),
     setFeatherRadius: (value) => set({ featherRadius: Math.max(0, Math.min(20, value)) }),

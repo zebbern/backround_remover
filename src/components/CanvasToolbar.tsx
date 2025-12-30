@@ -58,6 +58,12 @@ interface CanvasToolbarProps {
     onApplyCrop: () => void;
     onCancelCrop: () => void;
     onCopyToClipboard: () => void;
+    // Pending strokes
+    instantApply: boolean;
+    hasPendingStrokes: boolean;
+    onInstantApplyChange: (value: boolean) => void;
+    onCommitStrokes: () => void;
+    onClearPendingStrokes: () => void;
 }
 
 export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
@@ -96,6 +102,11 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
     onApplyCrop,
     onCancelCrop,
     onCopyToClipboard,
+    instantApply,
+    hasPendingStrokes,
+    onInstantApplyChange,
+    onCommitStrokes,
+    onClearPendingStrokes,
 }) => {
     const [showFormatMenu, setShowFormatMenu] = useState(false);
     const canUndo = historyIndex > 0;
@@ -165,6 +176,46 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                             <div className={clsx("w-2 h-2 rounded-full", brushMode === 'restore' ? "bg-lime-500" : "bg-zinc-600")} />
                             <span className="hidden xs:inline">Restore</span>
                         </button>
+                    </div>
+
+                    {/* Instant Apply Toggle & Pending Strokes Actions */}
+                    <div className="flex items-center gap-1 bg-zinc-950 rounded-lg border border-zinc-800 p-1">
+                        <button
+                            onClick={() => onInstantApplyChange(!instantApply)}
+                            className={clsx(
+                                "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm font-medium transition-colors touch-manipulation",
+                                instantApply
+                                    ? "bg-amber-500/20 text-amber-400"
+                                    : "bg-cyan-500/20 text-cyan-400"
+                            )}
+                            title={instantApply ? "Switch to Manual Apply" : "Switch to Instant Apply"}
+                            aria-pressed={instantApply}
+                        >
+                            <div className={clsx("w-2 h-2 rounded-full", instantApply ? "bg-amber-500" : "bg-cyan-500")} />
+                            <span className="hidden xs:inline">{instantApply ? 'Instant' : 'Manual'}</span>
+                        </button>
+                        
+                        {/* Show Apply/Cancel only when in manual mode with pending strokes */}
+                        {!instantApply && hasPendingStrokes && (
+                            <>
+                                <button
+                                    onClick={onCommitStrokes}
+                                    className="flex items-center gap-1 px-2.5 py-1.5 rounded text-sm font-medium bg-lime-500/20 text-lime-400 hover:bg-lime-500/30 transition-colors touch-manipulation"
+                                    title="Apply Changes (Enter)"
+                                >
+                                    <Check className="w-4 h-4" />
+                                    <span className="hidden xs:inline">Apply</span>
+                                </button>
+                                <button
+                                    onClick={onClearPendingStrokes}
+                                    className="flex items-center gap-1 px-2.5 py-1.5 rounded text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors touch-manipulation"
+                                    title="Cancel (Escape)"
+                                >
+                                    <X className="w-4 h-4" />
+                                    <span className="hidden xs:inline">Cancel</span>
+                                </button>
+                            </>
+                        )}
                     </div>
 
                     {/* Background Picker */}

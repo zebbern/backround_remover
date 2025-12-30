@@ -79,6 +79,12 @@ export const CanvasViewer: React.FC = () => {
     const undo = useAppStore((state) => state.undo);
     const redo = useAppStore((state) => state.redo);
 
+    // Instant apply / pending strokes
+    const instantApply = useAppStore((state) => state.instantApply);
+    const hasPendingStrokes = useAppStore((state) => state.hasPendingStrokes);
+    const setInstantApply = useAppStore((state) => state.setInstantApply);
+    const setHasPendingStrokes = useAppStore((state) => state.setHasPendingStrokes);
+
     // Actions
     const setBrushSize = useAppStore((state) => state.setBrushSize);
     const setBrushMode = useAppStore((state) => state.setBrushMode);
@@ -111,13 +117,15 @@ export const CanvasViewer: React.FC = () => {
     });
 
     // Brush painting hook
-    const { paintSelection, paintSelectionAtPoint, applySmartSelection } = useBrushPainting({
+    const { paintSelection, paintSelectionAtPoint, applySmartSelection, commitStrokes, clearPendingStrokes } = useBrushPainting({
         refs,
         imgObj,
         brushSize,
         brushMode,
         render,
         addToHistory,
+        instantApply,
+        onPendingStrokesChange: setHasPendingStrokes,
     });
 
     // Touch events hook
@@ -247,6 +255,9 @@ export const CanvasViewer: React.FC = () => {
         onStartCrop: handleStartCrop,
         onApplyCrop: handleApplyCrop,
         onCancelCrop: handleCancelCrop,
+        hasPendingStrokes,
+        onCommitStrokes: commitStrokes,
+        onClearPendingStrokes: clearPendingStrokes,
     });
 
     // Load original image and auto-fit to container
@@ -446,6 +457,11 @@ export const CanvasViewer: React.FC = () => {
                 onApplyCrop={handleApplyCrop}
                 onCancelCrop={handleCancelCrop}
                 onCopyToClipboard={handleCopyToClipboard}
+                instantApply={instantApply}
+                hasPendingStrokes={hasPendingStrokes}
+                onInstantApplyChange={setInstantApply}
+                onCommitStrokes={commitStrokes}
+                onClearPendingStrokes={clearPendingStrokes}
             />
 
             {/* Canvas Container */}

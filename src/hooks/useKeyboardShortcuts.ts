@@ -27,6 +27,10 @@ interface UseKeyboardShortcutsProps {
     onStartCrop?: () => void;
     onApplyCrop?: () => void;
     onCancelCrop?: () => void;
+    // Pending strokes
+    hasPendingStrokes?: boolean;
+    onCommitStrokes?: () => void;
+    onClearPendingStrokes?: () => void;
 }
 
 export function useKeyboardShortcuts({
@@ -40,6 +44,9 @@ export function useKeyboardShortcuts({
     onStartCrop,
     onApplyCrop,
     onCancelCrop,
+    hasPendingStrokes,
+    onCommitStrokes,
+    onClearPendingStrokes,
 }: UseKeyboardShortcutsProps) {
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -64,11 +71,17 @@ export function useKeyboardShortcuts({
                 if (isCropping) {
                     e.preventDefault();
                     onApplyCrop?.();
+                } else if (hasPendingStrokes) {
+                    e.preventDefault();
+                    onCommitStrokes?.();
                 }
             } else if (e.key === 'Escape') {
                 if (isCropping) {
                     e.preventDefault();
                     onCancelCrop?.();
+                } else if (hasPendingStrokes) {
+                    e.preventDefault();
+                    onClearPendingStrokes?.();
                 }
             } else if (e.key === 'f' || e.key === 'F') {
                 onFitToScreen?.();
@@ -87,5 +100,5 @@ export function useKeyboardShortcuts({
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [brushSize, setBrushSize, setBrushMode, undo, redo, onFitToScreen, isCropping, onStartCrop, onApplyCrop, onCancelCrop]);
+    }, [brushSize, setBrushSize, setBrushMode, undo, redo, onFitToScreen, isCropping, onStartCrop, onApplyCrop, onCancelCrop, hasPendingStrokes, onCommitStrokes, onClearPendingStrokes]);
 }

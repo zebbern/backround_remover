@@ -352,7 +352,7 @@ export function useCanvasRenderer({
             
             ctx.restore();
         }
-    }, [imgObj, brushMode, isDragging, backgroundColor, bgImgObj, featherRadius, shadowSettings, edgeRefinement, isCropping, cropRect]);
+    }, [imgObj, brushMode, isDragging, backgroundColor, bgImgObj, backgroundSize, featherRadius, shadowSettings, edgeRefinement, isCropping, cropRect]);
 
     return {
         canvasRef,

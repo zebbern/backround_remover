@@ -28,6 +28,7 @@ describe('CanvasToolbar', () => {
         historyLength: 1,
         backgroundColor: null,
         backgroundImage: null,
+        backgroundSize: 'cover' as const,
         onBrushModeChange: vi.fn(),
         onBrushSizeChange: vi.fn(),
         onZoomIn: vi.fn(),
@@ -39,6 +40,7 @@ describe('CanvasToolbar', () => {
         onReset: vi.fn(),
         onBackgroundColorChange: vi.fn(),
         onBackgroundImageChange: vi.fn(),
+        onBackgroundSizeChange: vi.fn(),
         exportFormat: 'png' as const,
         exportQuality: 0.92,
         onExportFormatChange: vi.fn(),
@@ -66,6 +68,11 @@ describe('CanvasToolbar', () => {
         onApplyCrop: vi.fn(),
         onCancelCrop: vi.fn(),
         onCopyToClipboard: vi.fn(),
+        instantApply: false,
+        hasPendingStrokes: false,
+        onInstantApplyChange: vi.fn(),
+        onCommitStrokes: vi.fn(),
+        onClearPendingStrokes: vi.fn(),
     };
 
     it('should display current brush size', () => {
