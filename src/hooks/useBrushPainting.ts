@@ -1,0 +1,193 @@
+/*
+ * Copyright 2025 Suvink
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { useCallback, useRef } from 'react';
+import type { CanvasRefs } from './useCanvasRenderer';
+
+interface UseBrushPaintingProps {
+    refs: CanvasRefs;
+    imgObj: HTMLImageElement | null;
+    brushSize: number;
+    brushMode: 'erase' | 'restore';
+    render: () => void;
+    addToHistory: (dataUrl: string) => void;
+}
+
+// Helper: Color Distance
+function colorDistance(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number) {
+    return Math.sqrt(Math.pow(r1 - r2, 2) + Math.pow(g1 - g2, 2) + Math.pow(b1 - b2, 2));
+}
+
+export function useBrushPainting({
+    refs,
+    imgObj,
+    brushSize,
+    brushMode,
+    render,
+    addToHistory,
+}: UseBrushPaintingProps) {
+    const { canvasRef, selectionCanvasRef, offscreenCanvasRef } = refs;
+    const renderScheduledRef = useRef(false);
+    const lastPointRef = useRef<{ x: number; y: number } | null>(null);
+
+    // Throttled render using requestAnimationFrame
+    const scheduleRender = useCallback(() => {
+        if (renderScheduledRef.current) return;
+        renderScheduledRef.current = true;
+        requestAnimationFrame(() => {
+            render();
+            renderScheduledRef.current = false;
+        });
+    }, [render]);
+
+    // Paint at specific screen coordinates - used by both mouse and touch
+    const paintSelectionAtPoint = useCallback((clientX: number, clientY: number) => {
+        const sc = selectionCanvasRef.current;
+        const canvas = canvasRef.current;
+        if (!sc || !canvas || !imgObj) return;
+
+        const ctx = sc.getContext('2d');
+        if (!ctx) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        const x = (clientX - rect.left) * scaleX;
+        const y = (clientY - rect.top) * scaleY;
+
+        // Draw line from last point for smoother strokes
+        const lastPoint = lastPointRef.current;
+        if (lastPoint) {
+            ctx.beginPath();
+            ctx.moveTo(lastPoint.x, lastPoint.y);
+            ctx.lineTo(x, y);
+            ctx.lineWidth = brushSize;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = brushMode === 'erase' ? '#ef4444' : '#22c55e';
+            ctx.stroke();
+        } else {
+            ctx.beginPath();
+            ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+            ctx.fillStyle = brushMode === 'erase' ? '#ef4444' : '#22c55e';
+            ctx.fill();
+        }
+        
+        lastPointRef.current = { x, y };
+        scheduleRender();
+    }, [canvasRef, selectionCanvasRef, imgObj, brushSize, brushMode, scheduleRender]);
+
+    // Handle Painting Selection (mouse event wrapper)
+    const paintSelection = useCallback((e: React.MouseEvent) => {
+        paintSelectionAtPoint(e.clientX, e.clientY);
+    }, [paintSelectionAtPoint]);
+
+    // Apply Smart Logic on Mouse Up
+    const applySmartSelection = useCallback(() => {
+        // Reset last point for next stroke
+        lastPointRef.current = null;
+        
+        const osc = offscreenCanvasRef.current;
+        const sc = selectionCanvasRef.current;
+        const canvas = canvasRef.current;
+
+        if (!osc || !sc || !canvas || !imgObj) return;
+
+        const ctx = osc.getContext('2d');
+        const scCtx = sc.getContext('2d');
+        if (!ctx || !scCtx) return;
+
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // Get all necessary image data
+        const maskImageData = ctx.getImageData(0, 0, width, height);
+        const maskData = maskImageData.data;
+
+        const selectionImageData = scCtx.getImageData(0, 0, width, height);
+        const selectionData = selectionImageData.data;
+
+        // Get original image data
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = width;
+        tempCanvas.height = height;
+        const tempCtx = tempCanvas.getContext('2d');
+        if (!tempCtx) return;
+        tempCtx.drawImage(imgObj, 0, 0);
+        const originalImageData = tempCtx.getImageData(0, 0, width, height);
+        const originalData = originalImageData.data;
+
+        // Calculate Average Color of Selection
+        let totalR = 0, totalG = 0, totalB = 0, count = 0;
+
+        for (let i = 0; i < selectionData.length; i += 4) {
+            if (selectionData[i + 3] > 0) {
+                totalR += originalData[i];
+                totalG += originalData[i + 1];
+                totalB += originalData[i + 2];
+                count++;
+            }
+        }
+
+        if (count === 0) return; // Nothing selected
+
+        const avgR = totalR / count;
+        const avgG = totalG / count;
+        const avgB = totalB / count;
+
+        const tolerance = 80; // Increased tolerance for better coverage
+
+        // Iterate through pixels
+        for (let i = 0; i < selectionData.length; i += 4) {
+            // Check if this pixel is selected (alpha > 0)
+            if (selectionData[i + 3] > 0) {
+                const r = originalData[i];
+                const g = originalData[i + 1];
+                const b = originalData[i + 2];
+
+                // Check color similarity to AVERAGE color
+                if (colorDistance(r, g, b, avgR, avgG, avgB) < tolerance) {
+                    if (brushMode === 'erase') {
+                        maskData[i + 3] = 0; // Transparent
+                    } else {
+                        // Restore
+                        maskData[i] = r;
+                        maskData[i + 1] = g;
+                        maskData[i + 2] = b;
+                        maskData[i + 3] = 255; // Opaque
+                    }
+                }
+            }
+        }
+
+        // Apply changes
+        ctx.putImageData(maskImageData, 0, 0);
+
+        // Clear selection canvas
+        scCtx.clearRect(0, 0, width, height);
+
+        // Save history
+        addToHistory(osc.toDataURL());
+
+        render();
+    }, [canvasRef, offscreenCanvasRef, selectionCanvasRef, imgObj, brushMode, addToHistory, render]);
+
+    return {
+        paintSelection,
+        paintSelectionAtPoint,
+        applySmartSelection,
+    };
+}

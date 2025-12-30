@@ -1,0 +1,200 @@
+/*
+ * Copyright 2025 Suvink
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { useEffect, useCallback } from 'react';
+import { ImageUploader } from './components/ImageUploader';
+import { CanvasViewer } from './components/CanvasViewer';
+import { ToastContainer } from './components/ToastContainer';
+import { CanvasErrorBoundary } from './components/ErrorBoundary';
+import { KeyboardShortcutsHelp } from './components/KeyboardShortcutsHelp';
+import { useAppStore } from './store/useAppStore';
+import { useBackgroundRemoval } from './hooks/useBackgroundRemoval';
+import { useModelPreload } from './hooks/useModelPreload';
+import { Github } from 'lucide-react';
+
+function App() {
+  const originalImage = useAppStore((state) => state.originalImage);
+  const isProcessing = useAppStore((state) => state.isProcessing);
+  const processingProgress = useAppStore((state) => state.processingProgress);
+  const error = useAppStore((state) => state.error);
+  const setError = useAppStore((state) => state.setError);
+
+  // Initialize background removal hook
+  useBackgroundRemoval();
+
+  // Preload the AI model and WASM files in the background for faster first processing
+  const { isPreloading, progress: preloadProgress } = useModelPreload();
+
+  // Get setOriginalImage for paste functionality
+  const setOriginalImage = useAppStore((state) => state.setOriginalImage);
+
+  // Global paste handler (Ctrl+V)
+  const handlePaste = useCallback((e: ClipboardEvent) => {
+    // Don't handle paste if already processing or in an input field
+    if (isProcessing) return;
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          const url = URL.createObjectURL(file);
+          setOriginalImage(url);
+        }
+        break;
+      }
+    }
+  }, [isProcessing, setOriginalImage]);
+
+  useEffect(() => {
+    document.addEventListener('paste', handlePaste);
+    return () => document.removeEventListener('paste', handlePaste);
+  }, [handlePaste]);
+
+  return (
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 selection:bg-lime-500/30">
+      {/* Error Banner */}
+      {error && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-red-500/10 border border-red-500 text-red-400 px-6 py-3 rounded-lg flex items-center gap-4 shadow-lg backdrop-blur-sm">
+          <span>{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="text-red-400 hover:text-red-300 font-bold text-lg"
+            aria-label="Dismiss error"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Processing Overlay */}
+      {isProcessing && (
+        <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm z-40 flex items-center justify-center">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center space-y-4 shadow-xl">
+            <div className="w-16 h-16 mx-auto border-4 border-lime-500 border-t-transparent rounded-full animate-spin" />
+            <div className="space-y-2">
+              <p className="text-xl font-semibold text-white">Processing Image...</p>
+              <p className="text-zinc-400">AI is removing the background</p>
+              {processingProgress > 0 && (
+                <div className="w-64 mx-auto">
+                  <div className="flex justify-between text-sm text-zinc-500 mb-1">
+                    <span>Progress</span>
+                    <span>{processingProgress}%</span>
+                  </div>
+                  <div className="bg-zinc-800 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-lime-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${processingProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <header className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-lime-500 rounded-lg flex items-center justify-center">
+              <img src="/cut-it-out-logo.png" alt="Background Remover Logo" className="w-5 h-5" />
+            </div>
+            <span className="font-bold text-xl tracking-tight text-white">Background Remover</span>
+          </div>
+          <nav className="flex items-center gap-4">
+            <a
+              href="https://github.com/zebbern"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-zinc-100 text-zinc-900 rounded-lg hover:bg-lime-400 hover:text-black transition-all font-medium text-sm"
+            >
+              <Github className="w-4 h-4" />
+              GitHub
+            </a>
+          </nav>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 py-8 min-h-[calc(100vh-8rem)]">
+        {!originalImage ? (
+          <div className="max-w-2xl mx-auto space-y-12 pt-12">
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                Remove Backgrounds <br />
+                <span className="text-lime-400">100% Automatically</span>
+              </h1>
+              <p className="text-lg text-zinc-400 max-w-lg mx-auto">
+                Free, open-source, and runs entirely in your browser. No images are ever uploaded to a server.
+              </p>
+            </div>
+
+            <ImageUploader />
+
+            {/* Preload indicator - shows model is being prepared */}
+            {isPreloading && (
+              <div className="flex items-center justify-center gap-2 text-sm text-zinc-500">
+                <div className="w-3 h-3 border-2 border-lime-500 border-t-transparent rounded-full animate-spin" />
+                <span>Preparing AI model... {preloadProgress > 0 ? `${preloadProgress}%` : ''}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8">
+              {[
+                { title: 'Privacy First', desc: 'Images never leave your device' },
+                { title: 'AI Powered', desc: 'State-of-the-art U2-Net model' },
+                { title: 'Free Forever', desc: 'Open source and no hidden costs' }
+              ].map((item, i) => (
+                <div key={i} className="text-center p-4 rounded-lg bg-zinc-900 border border-zinc-800 shadow-sm">
+                  <h3 className="font-semibold text-zinc-100 mb-1">{item.title}</h3>
+                  <p className="text-sm text-zinc-500">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <CanvasErrorBoundary onReset={() => useAppStore.getState().reset()}>
+            <CanvasViewer />
+          </CanvasErrorBoundary>
+        )}
+      </main>
+
+      <footer className="py-6 border-t border-zinc-900">
+        <div className="flex items-center justify-center gap-3">
+          <img 
+            src="/zebbern-avatar.png" 
+            alt="zebbern" 
+            className="w-8 h-8 rounded-full border border-zinc-700"
+          />
+          <span className="text-zinc-500 text-sm">Made by <a href="https://github.com/zebbern" target="_blank" rel="noopener noreferrer" className="text-lime-400 hover:text-lime-300 transition-colors">zebbern</a></span>
+        </div>
+      </footer>
+
+      {/* Toast Notifications */}
+      <ToastContainer />
+
+      {/* Keyboard Shortcuts Help */}
+      <KeyboardShortcutsHelp />
+    </div>
+  );
+}
+
+export default App;
+

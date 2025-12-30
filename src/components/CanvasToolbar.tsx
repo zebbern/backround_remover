@@ -1,0 +1,373 @@
+/*
+ * Copyright 2025 Suvink
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import React, { useState } from 'react';
+import { Download, ZoomIn, ZoomOut, Minus, Plus, Undo, Redo, Maximize, ChevronDown, SlidersHorizontal, Crop, Check, X, Copy } from 'lucide-react';
+import clsx from 'clsx';
+import { BackgroundPicker } from './BackgroundPicker';
+import { ShadowPicker } from './ShadowPicker';
+import { EdgeRefinementPicker } from './EdgeRefinementPicker';
+import type { ExportFormat, ShadowSettings, EdgeRefinementSettings } from '../store/useAppStore';
+
+interface CanvasToolbarProps {
+    brushMode: 'erase' | 'restore';
+    brushSize: number;
+    zoom: number;
+    historyIndex: number;
+    historyLength: number;
+    backgroundColor: string | null;
+    backgroundImage: string | null;
+    onBrushModeChange: (mode: 'erase' | 'restore') => void;
+    onBrushSizeChange: (size: number) => void;
+    onZoomIn: () => void;
+    onZoomOut: () => void;
+    onFitToScreen: () => void;
+    onUndo: () => void;
+    onRedo: () => void;
+    onDownload: () => void;
+    onReset: () => void;
+    onBackgroundColorChange: (color: string | null) => void;
+    onBackgroundImageChange: (image: string | null) => void;
+    exportFormat: ExportFormat;
+    exportQuality: number;
+    onExportFormatChange: (format: ExportFormat) => void;
+    onExportQualityChange: (quality: number) => void;
+    featherRadius: number;
+    onFeatherRadiusChange: (value: number) => void;
+    shadowSettings: ShadowSettings;
+    onShadowChange: (settings: Partial<ShadowSettings>) => void;
+    edgeRefinement: EdgeRefinementSettings;
+    onEdgeRefinementChange: (settings: Partial<EdgeRefinementSettings>) => void;
+    isCropping: boolean;
+    onStartCrop: () => void;
+    onApplyCrop: () => void;
+    onCancelCrop: () => void;
+    onCopyToClipboard: () => void;
+}
+
+export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
+    brushMode,
+    brushSize,
+    zoom,
+    historyIndex,
+    historyLength,
+    backgroundColor,
+    backgroundImage,
+    onBrushModeChange,
+    onBrushSizeChange,
+    onZoomIn,
+    onZoomOut,
+    onFitToScreen,
+    onUndo,
+    onRedo,
+    onDownload,
+    onReset,
+    onBackgroundColorChange,
+    onBackgroundImageChange,
+    exportFormat,
+    exportQuality,
+    onExportFormatChange,
+    onExportQualityChange,
+    featherRadius,
+    onFeatherRadiusChange,
+    shadowSettings,
+    onShadowChange,
+    edgeRefinement,
+    onEdgeRefinementChange,
+    isCropping,
+    onStartCrop,
+    onApplyCrop,
+    onCancelCrop,
+    onCopyToClipboard,
+}) => {
+    const [showFormatMenu, setShowFormatMenu] = useState(false);
+    const canUndo = historyIndex > 0;
+    const canRedo = historyIndex < historyLength - 1;
+
+    const formatLabels: Record<ExportFormat, string> = {
+        png: 'PNG',
+        jpeg: 'JPEG',
+        webp: 'WebP',
+    };
+
+    return (
+        <>
+            {/* Main Toolbar - Mobile Responsive */}
+            <div className="flex flex-col bg-zinc-900 p-2 rounded-xl border border-zinc-800 shadow-sm gap-2">
+                {/* Top Row - Essential Controls */}
+                <div className="flex flex-wrap items-center gap-2">
+                    {/* Brush Size Control */}
+                    <div className="flex items-center gap-2 px-2 py-1 bg-zinc-950 rounded-lg border border-zinc-800">
+                        <span className="text-xs font-medium text-zinc-500">Brush</span>
+                        <button
+                            onClick={() => onBrushSizeChange(Math.max(brushSize - 10, 10))}
+                            className="p-1.5 hover:bg-zinc-800 active:bg-zinc-700 rounded text-zinc-400 hover:text-lime-400 transition-colors touch-manipulation"
+                            title="Decrease size ([)"
+                            aria-label="Decrease brush size"
+                        >
+                            <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="w-7 text-center font-mono text-sm text-zinc-200">{brushSize}</span>
+                        <button
+                            onClick={() => onBrushSizeChange(Math.min(brushSize + 10, 200))}
+                            className="p-1.5 hover:bg-zinc-800 active:bg-zinc-700 rounded text-zinc-400 hover:text-lime-400 transition-colors touch-manipulation"
+                            title="Increase size (])"
+                            aria-label="Increase brush size"
+                        >
+                            <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    {/* Brush Mode Toggle */}
+                    <div className="flex items-center gap-1 bg-zinc-950 rounded-lg border border-zinc-800 p-1">
+                        <button
+                            onClick={() => onBrushModeChange('erase')}
+                            className={clsx(
+                                "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm font-medium transition-colors touch-manipulation",
+                                brushMode === 'erase'
+                                    ? "bg-red-500/20 text-red-400"
+                                    : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                            )}
+                            title="Erase Mode (E)"
+                            aria-pressed={brushMode === 'erase'}
+                        >
+                            <div className={clsx("w-2 h-2 rounded-full", brushMode === 'erase' ? "bg-red-500" : "bg-zinc-600")} />
+                            <span className="hidden xs:inline">Erase</span>
+                        </button>
+                        <button
+                            onClick={() => onBrushModeChange('restore')}
+                            className={clsx(
+                                "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm font-medium transition-colors touch-manipulation",
+                                brushMode === 'restore'
+                                    ? "bg-lime-500/20 text-lime-400"
+                                    : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                            )}
+                            title="Restore Mode (R)"
+                            aria-pressed={brushMode === 'restore'}
+                        >
+                            <div className={clsx("w-2 h-2 rounded-full", brushMode === 'restore' ? "bg-lime-500" : "bg-zinc-600")} />
+                            <span className="hidden xs:inline">Restore</span>
+                        </button>
+                    </div>
+
+                    {/* Background Picker */}
+                    <BackgroundPicker
+                        backgroundColor={backgroundColor}
+                        backgroundImage={backgroundImage}
+                        onColorChange={onBackgroundColorChange}
+                        onImageChange={onBackgroundImageChange}
+                    />
+
+                    {/* Shadow/Glow Effects */}
+                    <ShadowPicker
+                        shadowSettings={shadowSettings}
+                        onShadowChange={onShadowChange}
+                    />
+
+                    {/* Edge Refinement */}
+                    <EdgeRefinementPicker
+                        settings={edgeRefinement}
+                        onChange={onEdgeRefinementChange}
+                    />
+
+                    {/* Feather Edges Slider */}
+                    <div className="flex items-center gap-2 px-2 py-1 bg-zinc-950 rounded-lg border border-zinc-800">
+                        <SlidersHorizontal className="w-4 h-4 text-zinc-400" />
+                        <input
+                            type="range"
+                            min="0"
+                            max="20"
+                            step="1"
+                            value={featherRadius}
+                            onChange={(e) => onFeatherRadiusChange(parseInt(e.target.value))}
+                            className="w-14 accent-lime-500"
+                            title={`Feather Edges: ${featherRadius}px`}
+                            disabled={isCropping}
+                        />
+                        <span className="w-4 text-center font-mono text-xs text-zinc-400">{featherRadius}</span>
+                    </div>
+
+                    {/* Crop Tool */}
+                    {!isCropping ? (
+                        <button
+                            onClick={onStartCrop}
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-zinc-400 bg-zinc-950 border border-zinc-800 hover:bg-zinc-800 hover:text-lime-400 transition-colors touch-manipulation"
+                            title="Crop Image (C)"
+                        >
+                            <Crop className="w-4 h-4" />
+                            <span className="hidden sm:inline">Crop</span>
+                        </button>
+                    ) : (
+                        <div className="flex items-center gap-1">
+                            <button
+                                onClick={onApplyCrop}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm font-medium bg-lime-500/20 text-lime-400 hover:bg-lime-500/30 transition-colors touch-manipulation"
+                                title="Apply Crop (Enter)"
+                            >
+                                <Check className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={onCancelCrop}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm font-medium text-zinc-400 hover:bg-zinc-800 hover:text-red-400 transition-colors touch-manipulation"
+                                title="Cancel Crop (Escape)"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Spacer */}
+                    <div className="flex-1" />
+
+                    {/* Undo/Redo */}
+                    <div className="flex items-center gap-0.5 bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+                        <button
+                            onClick={onUndo}
+                            disabled={!canUndo}
+                            className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 rounded disabled:opacity-30 disabled:hover:bg-transparent transition-all touch-manipulation"
+                            title="Undo (Ctrl+Z)"
+                            aria-label="Undo"
+                        >
+                            <Undo className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={onRedo}
+                            disabled={!canRedo}
+                            className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 rounded disabled:opacity-30 disabled:hover:bg-transparent transition-all touch-manipulation"
+                            title="Redo (Ctrl+Shift+Z)"
+                            aria-label="Redo"
+                        >
+                            <Redo className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    {/* Zoom Controls */}
+                    <div className="flex items-center gap-0.5 bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+                        <button 
+                            onClick={onZoomOut} 
+                            className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 rounded transition-all touch-manipulation"
+                            aria-label="Zoom out"
+                            title="Zoom Out"
+                        >
+                            <ZoomOut className="w-4 h-4" />
+                        </button>
+                        <button 
+                            onClick={onFitToScreen} 
+                            className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 rounded transition-all touch-manipulation"
+                            aria-label="Fit to screen"
+                            title="Fit to Screen (F)"
+                        >
+                            <Maximize className="w-4 h-4" />
+                        </button>
+                        <span className="w-10 text-center font-mono text-xs text-zinc-400">{Math.round(zoom * 100)}%</span>
+                        <button 
+                            onClick={onZoomIn} 
+                            className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 rounded transition-all touch-manipulation"
+                            aria-label="Zoom in"
+                            title="Zoom In"
+                        >
+                            <ZoomIn className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom Bar */}
+            <div className="flex flex-wrap justify-between items-center gap-2">
+                <button
+                    onClick={onReset}
+                    className="px-3 py-2 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900 rounded-lg transition-colors text-sm font-medium touch-manipulation"
+                >
+                    Start Over
+                </button>
+
+                <div className="flex items-center gap-2 flex-wrap justify-end">
+                    {/* Export Format Selector */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowFormatMenu(!showFormatMenu)}
+                            className="flex items-center gap-1.5 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-sm font-medium transition-colors touch-manipulation"
+                            title="Export format"
+                        >
+                            {formatLabels[exportFormat]}
+                            <ChevronDown className="w-3.5 h-3.5" />
+                        </button>
+                        {showFormatMenu && (
+                            <>
+                                <div 
+                                    className="fixed inset-0 z-40" 
+                                    onClick={() => setShowFormatMenu(false)}
+                                />
+                                <div className="absolute right-0 bottom-full mb-2 z-50 bg-zinc-900 rounded-lg border border-zinc-800 shadow-xl overflow-hidden min-w-[140px]">
+                                    {(['png', 'jpeg', 'webp'] as ExportFormat[]).map((format) => (
+                                        <button
+                                            key={format}
+                                            onClick={() => {
+                                                onExportFormatChange(format);
+                                                setShowFormatMenu(false);
+                                            }}
+                                            className={clsx(
+                                                "w-full px-4 py-2.5 text-left text-sm transition-colors",
+                                                exportFormat === format
+                                                    ? "bg-lime-500/10 text-lime-400"
+                                                    : "text-zinc-300 hover:bg-zinc-800"
+                                            )}
+                                        >
+                                            {formatLabels[format]}
+                                            {format !== 'png' && (
+                                                <span className="text-zinc-500 ml-2">({Math.round(exportQuality * 100)}%)</span>
+                                            )}
+                                        </button>
+                                    ))}
+                                    {exportFormat !== 'png' && (
+                                        <div className="px-4 py-3 border-t border-zinc-800">
+                                            <label className="text-xs text-zinc-500 block mb-2">Quality</label>
+                                            <input
+                                                type="range"
+                                                min="10"
+                                                max="100"
+                                                value={Math.round(exportQuality * 100)}
+                                                onChange={(e) => onExportQualityChange(parseInt(e.target.value) / 100)}
+                                                className="w-full accent-lime-500"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    <button
+                        onClick={onCopyToClipboard}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition-all touch-manipulation"
+                        title="Copy to Clipboard"
+                    >
+                        <Copy className="w-4 h-4" />
+                        <span className="hidden sm:inline">Copy</span>
+                    </button>
+
+                    <button
+                        onClick={onDownload}
+                        className="flex items-center justify-center gap-1.5 px-4 py-2 bg-lime-500 hover:bg-lime-400 text-black rounded-lg font-bold transition-all shadow-lg shadow-lime-500/20 touch-manipulation"
+                    >
+                        <Download className="w-4 h-4" />
+                        <span className="hidden xs:inline">Download</span>
+                    </button>
+                </div>
+            </div>
+        </>
+    );
+};
