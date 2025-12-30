@@ -17,12 +17,15 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { ImagePlus, X, Palette } from 'lucide-react';
 import clsx from 'clsx';
+import type { BackgroundSize } from '../store/useAppStore';
 
 interface BackgroundPickerProps {
     backgroundColor: string | null;
     backgroundImage: string | null;
+    backgroundSize: BackgroundSize;
     onColorChange: (color: string | null) => void;
     onImageChange: (image: string | null) => void;
+    onSizeChange: (size: BackgroundSize) => void;
 }
 
 const PRESET_COLORS = [
@@ -40,8 +43,10 @@ const PRESET_COLORS = [
 export const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
     backgroundColor,
     backgroundImage,
+    backgroundSize,
     onColorChange,
     onImageChange,
+    onSizeChange,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [customColor, setCustomColor] = useState('#FFFFFF');
@@ -229,6 +234,27 @@ export const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
                                     >
                                         <X className="w-4 h-4" />
                                     </button>
+                                </div>
+                                
+                                {/* Background Size Selector */}
+                                <div className="mt-3">
+                                    <span className="text-xs text-zinc-500 mb-2 block">Background Size</span>
+                                    <div className="grid grid-cols-4 gap-1">
+                                        {(['cover', 'contain', 'stretch', 'tile'] as const).map((size) => (
+                                            <button
+                                                key={size}
+                                                onClick={() => onSizeChange(size)}
+                                                className={clsx(
+                                                    "px-2 py-1.5 rounded text-xs font-medium transition-colors capitalize",
+                                                    backgroundSize === size
+                                                        ? "bg-lime-500/20 text-lime-400"
+                                                        : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                                                )}
+                                            >
+                                                {size}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         )}

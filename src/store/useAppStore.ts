@@ -37,6 +37,8 @@ export interface CropRect {
 
 export type EdgeRefinementMode = 'off' | 'standard' | 'hair';
 
+export type BackgroundSize = 'cover' | 'contain' | 'stretch' | 'tile';
+
 export interface EdgeRefinementSettings {
     mode: EdgeRefinementMode;
     edgeContrast: number;      // 0-100: How much to sharpen edge detection
@@ -69,6 +71,7 @@ interface AppState {
     // Background replacement
     backgroundColor: string | null; // Hex color or null for transparent
     backgroundImage: string | null; // URL or base64 of custom background image
+    backgroundSize: BackgroundSize; // How background image is scaled
 
     // Shadow/glow effect
     shadowSettings: ShadowSettings;
@@ -101,6 +104,7 @@ interface AppState {
 
     setBackgroundColor: (color: string | null) => void;
     setBackgroundImage: (image: string | null) => void;
+    setBackgroundSize: (size: BackgroundSize) => void;
 
     setEdgeRefinement: (settings: Partial<EdgeRefinementSettings>) => void;
 
@@ -142,6 +146,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     backgroundColor: null,
     backgroundImage: null,
+    backgroundSize: 'cover',
 
     shadowSettings: {
         type: 'none',
@@ -295,6 +300,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
         set({ backgroundImage: image, backgroundColor: null });
     },
+    setBackgroundSize: (size) => set({ backgroundSize: size }),
 
     setEdgeRefinement: (settings) => set((state) => ({
         edgeRefinement: { ...state.edgeRefinement, ...settings }

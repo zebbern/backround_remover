@@ -53,8 +53,10 @@ export const CanvasViewer: React.FC = () => {
     // Background replacement
     const backgroundColor = useAppStore((state) => state.backgroundColor);
     const backgroundImage = useAppStore((state) => state.backgroundImage);
+    const backgroundSize = useAppStore((state) => state.backgroundSize);
     const setBackgroundColor = useAppStore((state) => state.setBackgroundColor);
     const setBackgroundImage = useAppStore((state) => state.setBackgroundImage);
+    const setBackgroundSize = useAppStore((state) => state.setBackgroundSize);
 
     // Shadow/glow effects
     const shadowSettings = useAppStore((state) => state.shadowSettings);
@@ -100,6 +102,7 @@ export const CanvasViewer: React.FC = () => {
         isDragging,
         backgroundColor,
         backgroundImage,
+        backgroundSize,
         featherRadius,
         shadowSettings,
         edgeRefinement,
@@ -141,6 +144,7 @@ export const CanvasViewer: React.FC = () => {
         refs,
         backgroundColor,
         backgroundImage,
+        backgroundSize,
         featherRadius,
         shadowSettings,
         edgeRefinement,
@@ -414,6 +418,7 @@ export const CanvasViewer: React.FC = () => {
                 historyLength={history.length}
                 backgroundColor={backgroundColor}
                 backgroundImage={backgroundImage}
+                backgroundSize={backgroundSize}
                 onBrushModeChange={setBrushMode}
                 onBrushSizeChange={setBrushSize}
                 onZoomIn={handleZoomIn}
@@ -425,6 +430,7 @@ export const CanvasViewer: React.FC = () => {
                 onReset={reset}
                 onBackgroundColorChange={setBackgroundColor}
                 onBackgroundImageChange={setBackgroundImage}
+                onBackgroundSizeChange={setBackgroundSize}
                 exportFormat={exportFormat}
                 exportQuality={exportQuality}
                 onExportFormatChange={setExportFormat}

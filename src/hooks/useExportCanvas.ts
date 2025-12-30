@@ -16,7 +16,7 @@
 
 import { useCallback } from 'react';
 import { toast } from '../store/useToastStore';
-import type { ExportFormat, ShadowSettings, EdgeRefinementSettings } from '../store/useAppStore';
+import type { ExportFormat, ShadowSettings, EdgeRefinementSettings, BackgroundSize } from '../store/useAppStore';
 import type { CanvasRefs } from './useCanvasRenderer';
 import { applyEdgeRefinement } from '../utils/edgeRefinement';
 
@@ -24,6 +24,7 @@ interface UseExportCanvasProps {
     refs: CanvasRefs;
     backgroundColor: string | null;
     backgroundImage: string | null;
+    backgroundSize: BackgroundSize;
     featherRadius: number;
     shadowSettings: ShadowSettings;
     edgeRefinement: EdgeRefinementSettings;
@@ -49,6 +50,7 @@ async function createExportCanvas(
     options: {
         backgroundColor: string | null;
         backgroundImage: string | null;
+        backgroundSize: BackgroundSize;
         featherRadius: number;
         shadowSettings: ShadowSettings;
         edgeRefinement: EdgeRefinementSettings;
@@ -57,7 +59,7 @@ async function createExportCanvas(
         originalImage?: HTMLImageElement | null;
     }
 ): Promise<HTMLCanvasElement | null> {
-    const { backgroundColor, backgroundImage, featherRadius, shadowSettings, edgeRefinement, exportFormat, includeJpegBackground = true, originalImage } = options;
+    const { backgroundColor, backgroundImage, backgroundSize, featherRadius, shadowSettings, edgeRefinement, exportFormat, includeJpegBackground = true, originalImage } = options;
 
     // First, apply edge refinement to the source canvas if enabled
     let refinedCanvas = sourceCanvas;
@@ -116,15 +118,45 @@ async function createExportCanvas(
             img.src = backgroundImage;
         });
         
-        const scale = Math.max(
-            exportCanvas.width / bgImg.width,
-            exportCanvas.height / bgImg.height
-        );
-        const scaledWidth = bgImg.width * scale;
-        const scaledHeight = bgImg.height * scale;
-        const x = (exportCanvas.width - scaledWidth) / 2;
-        const y = (exportCanvas.height - scaledHeight) / 2;
-        ctx.drawImage(bgImg, x, y, scaledWidth, scaledHeight);
+        // Draw background image based on backgroundSize mode
+        switch (backgroundSize) {
+            case 'cover': {
+                const scale = Math.max(
+                    exportCanvas.width / bgImg.width,
+                    exportCanvas.height / bgImg.height
+                );
+                const scaledWidth = bgImg.width * scale;
+                const scaledHeight = bgImg.height * scale;
+                const x = (exportCanvas.width - scaledWidth) / 2;
+                const y = (exportCanvas.height - scaledHeight) / 2;
+                ctx.drawImage(bgImg, x, y, scaledWidth, scaledHeight);
+                break;
+            }
+            case 'contain': {
+                const scale = Math.min(
+                    exportCanvas.width / bgImg.width,
+                    exportCanvas.height / bgImg.height
+                );
+                const scaledWidth = bgImg.width * scale;
+                const scaledHeight = bgImg.height * scale;
+                const x = (exportCanvas.width - scaledWidth) / 2;
+                const y = (exportCanvas.height - scaledHeight) / 2;
+                ctx.drawImage(bgImg, x, y, scaledWidth, scaledHeight);
+                break;
+            }
+            case 'stretch': {
+                ctx.drawImage(bgImg, 0, 0, exportCanvas.width, exportCanvas.height);
+                break;
+            }
+            case 'tile': {
+                const pattern = ctx.createPattern(bgImg, 'repeat');
+                if (pattern) {
+                    ctx.fillStyle = pattern;
+                    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+                }
+                break;
+            }
+        }
     }
 
     // Draw shadow/glow effect if enabled
@@ -186,6 +218,7 @@ export function useExportCanvas({
     refs,
     backgroundColor,
     backgroundImage,
+    backgroundSize,
     featherRadius,
     shadowSettings,
     edgeRefinement,
@@ -201,6 +234,7 @@ export function useExportCanvas({
             const exportCanvas = await createExportCanvas(osc, {
                 backgroundColor,
                 backgroundImage,
+                backgroundSize,
                 featherRadius,
                 shadowSettings,
                 edgeRefinement,
@@ -237,7 +271,7 @@ export function useExportCanvas({
             console.error('Failed to export image:', err);
             toast.error('Failed to download image');
         }
-    }, [refs, backgroundColor, backgroundImage, featherRadius, shadowSettings, edgeRefinement, exportFormat, exportQuality, onDownloadComplete]);
+    }, [refs, backgroundColor, backgroundImage, backgroundSize, featherRadius, shadowSettings, edgeRefinement, exportFormat, exportQuality, onDownloadComplete]);
 
     const handleCopyToClipboard = useCallback(async () => {
         const osc = refs.offscreenCanvasRef.current;
@@ -248,6 +282,7 @@ export function useExportCanvas({
             const exportCanvas = await createExportCanvas(osc, {
                 backgroundColor,
                 backgroundImage,
+                backgroundSize,
                 featherRadius,
                 shadowSettings,
                 edgeRefinement,
@@ -270,7 +305,7 @@ export function useExportCanvas({
             console.error('Failed to copy to clipboard:', err);
             toast.error('Failed to copy to clipboard');
         }
-    }, [refs, backgroundColor, backgroundImage, featherRadius, shadowSettings, edgeRefinement]);
+    }, [refs, backgroundColor, backgroundImage, backgroundSize, featherRadius, shadowSettings, edgeRefinement]);
 
     return {
         handleDownload,

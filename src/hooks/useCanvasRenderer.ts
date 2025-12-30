@@ -15,7 +15,7 @@
  */
 
 import { useCallback, useRef, useEffect, useMemo, useState } from 'react';
-import type { CropRect, ShadowSettings, EdgeRefinementSettings } from '../store/useAppStore';
+import type { CropRect, ShadowSettings, EdgeRefinementSettings, BackgroundSize } from '../store/useAppStore';
 import { applyEdgeRefinement } from '../utils/edgeRefinement';
 
 interface UseCanvasRendererProps {
@@ -24,6 +24,7 @@ interface UseCanvasRendererProps {
     isDragging: boolean;
     backgroundColor: string | null;
     backgroundImage: string | null;
+    backgroundSize: BackgroundSize;
     featherRadius: number;
     shadowSettings: ShadowSettings;
     edgeRefinement: EdgeRefinementSettings;
@@ -44,6 +45,7 @@ export function useCanvasRenderer({
     isDragging,
     backgroundColor,
     backgroundImage,
+    backgroundSize,
     featherRadius,
     shadowSettings,
     edgeRefinement,
@@ -157,16 +159,49 @@ export function useCanvasRenderer({
             ctx.fillStyle = backgroundColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         } else if (bgImgObj) {
-            // Scale background image to cover the canvas while maintaining aspect ratio
-            const scale = Math.max(
-                canvas.width / bgImgObj.width,
-                canvas.height / bgImgObj.height
-            );
-            const scaledWidth = bgImgObj.width * scale;
-            const scaledHeight = bgImgObj.height * scale;
-            const x = (canvas.width - scaledWidth) / 2;
-            const y = (canvas.height - scaledHeight) / 2;
-            ctx.drawImage(bgImgObj, x, y, scaledWidth, scaledHeight);
+            // Draw background image based on backgroundSize mode
+            switch (backgroundSize) {
+                case 'cover': {
+                    // Scale to cover entire canvas (may crop)
+                    const scale = Math.max(
+                        canvas.width / bgImgObj.width,
+                        canvas.height / bgImgObj.height
+                    );
+                    const scaledWidth = bgImgObj.width * scale;
+                    const scaledHeight = bgImgObj.height * scale;
+                    const x = (canvas.width - scaledWidth) / 2;
+                    const y = (canvas.height - scaledHeight) / 2;
+                    ctx.drawImage(bgImgObj, x, y, scaledWidth, scaledHeight);
+                    break;
+                }
+                case 'contain': {
+                    // Scale to fit entirely (may have letterboxing)
+                    const scale = Math.min(
+                        canvas.width / bgImgObj.width,
+                        canvas.height / bgImgObj.height
+                    );
+                    const scaledWidth = bgImgObj.width * scale;
+                    const scaledHeight = bgImgObj.height * scale;
+                    const x = (canvas.width - scaledWidth) / 2;
+                    const y = (canvas.height - scaledHeight) / 2;
+                    ctx.drawImage(bgImgObj, x, y, scaledWidth, scaledHeight);
+                    break;
+                }
+                case 'stretch': {
+                    // Stretch to fill exactly (may distort)
+                    ctx.drawImage(bgImgObj, 0, 0, canvas.width, canvas.height);
+                    break;
+                }
+                case 'tile': {
+                    // Tile/repeat the background image at its original size
+                    const pattern = ctx.createPattern(bgImgObj, 'repeat');
+                    if (pattern) {
+                        ctx.fillStyle = pattern;
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    }
+                    break;
+                }
+            }
         }
 
         // 1. Draw Ghost Overlay (Bottom Layer)

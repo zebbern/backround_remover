@@ -20,7 +20,7 @@ import clsx from 'clsx';
 import { BackgroundPicker } from './BackgroundPicker';
 import { ShadowPicker } from './ShadowPicker';
 import { EdgeRefinementPicker } from './EdgeRefinementPicker';
-import type { ExportFormat, ShadowSettings, EdgeRefinementSettings } from '../store/useAppStore';
+import type { ExportFormat, ShadowSettings, EdgeRefinementSettings, BackgroundSize } from '../store/useAppStore';
 
 interface CanvasToolbarProps {
     brushMode: 'erase' | 'restore';
@@ -30,6 +30,7 @@ interface CanvasToolbarProps {
     historyLength: number;
     backgroundColor: string | null;
     backgroundImage: string | null;
+    backgroundSize: BackgroundSize;
     onBrushModeChange: (mode: 'erase' | 'restore') => void;
     onBrushSizeChange: (size: number) => void;
     onZoomIn: () => void;
@@ -41,6 +42,7 @@ interface CanvasToolbarProps {
     onReset: () => void;
     onBackgroundColorChange: (color: string | null) => void;
     onBackgroundImageChange: (image: string | null) => void;
+    onBackgroundSizeChange: (size: BackgroundSize) => void;
     exportFormat: ExportFormat;
     exportQuality: number;
     onExportFormatChange: (format: ExportFormat) => void;
@@ -66,6 +68,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
     historyLength,
     backgroundColor,
     backgroundImage,
+    backgroundSize,
     onBrushModeChange,
     onBrushSizeChange,
     onZoomIn,
@@ -77,6 +80,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
     onReset,
     onBackgroundColorChange,
     onBackgroundImageChange,
+    onBackgroundSizeChange,
     exportFormat,
     exportQuality,
     onExportFormatChange,
@@ -167,8 +171,10 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                     <BackgroundPicker
                         backgroundColor={backgroundColor}
                         backgroundImage={backgroundImage}
+                        backgroundSize={backgroundSize}
                         onColorChange={onBackgroundColorChange}
                         onImageChange={onBackgroundImageChange}
+                        onSizeChange={onBackgroundSizeChange}
                     />
 
                     {/* Shadow/Glow Effects */}

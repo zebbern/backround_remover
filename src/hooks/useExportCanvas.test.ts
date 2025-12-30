@@ -78,7 +78,7 @@ describe('useExportCanvas', () => {
             useExportCanvas({
                 refs: mockRefs,
                 backgroundColor: null,
-                backgroundImage: null,
+                backgroundImage: null, backgroundSize: 'cover',
                 featherRadius: 0,
                 shadowSettings: mockShadowSettings,
                 edgeRefinement: mockEdgeRefinement,
@@ -96,7 +96,7 @@ describe('useExportCanvas', () => {
             useExportCanvas({
                 refs: mockRefs,
                 backgroundColor: null,
-                backgroundImage: null,
+                backgroundImage: null, backgroundSize: 'cover',
                 featherRadius: 0,
                 shadowSettings: mockShadowSettings,
                 edgeRefinement: mockEdgeRefinement,
@@ -122,7 +122,7 @@ describe('useExportCanvas', () => {
             useExportCanvas({
                 refs: emptyRefs,
                 backgroundColor: null,
-                backgroundImage: null,
+                backgroundImage: null, backgroundSize: 'cover',
                 featherRadius: 0,
                 shadowSettings: mockShadowSettings,
                 edgeRefinement: mockEdgeRefinement,
@@ -141,7 +141,7 @@ describe('useExportCanvas', () => {
             useExportCanvas({
                 refs: mockRefs,
                 backgroundColor: '#FF0000',
-                backgroundImage: null,
+                backgroundImage: null, backgroundSize: 'cover',
                 featherRadius: 0,
                 shadowSettings: mockShadowSettings,
                 edgeRefinement: mockEdgeRefinement,
@@ -163,7 +163,7 @@ describe('useExportCanvas', () => {
             useExportCanvas({
                 refs: mockRefs,
                 backgroundColor: null,
-                backgroundImage: null,
+                backgroundImage: null, backgroundSize: 'cover',
                 featherRadius: 0,
                 shadowSettings: shadowWithDropShadow,
                 edgeRefinement: mockEdgeRefinement,
@@ -185,7 +185,7 @@ describe('useExportCanvas', () => {
             useExportCanvas({
                 refs: mockRefs,
                 backgroundColor: null,
-                backgroundImage: null,
+                backgroundImage: null, backgroundSize: 'cover',
                 featherRadius: 0,
                 shadowSettings: shadowWithGlow,
                 edgeRefinement: mockEdgeRefinement,
@@ -202,7 +202,7 @@ describe('useExportCanvas', () => {
             useExportCanvas({
                 refs: mockRefs,
                 backgroundColor: null,
-                backgroundImage: null,
+                backgroundImage: null, backgroundSize: 'cover',
                 featherRadius: 10,
                 shadowSettings: mockShadowSettings,
                 edgeRefinement: mockEdgeRefinement,
@@ -222,7 +222,7 @@ describe('useExportCanvas', () => {
                 useExportCanvas({
                     refs: mockRefs,
                     backgroundColor: null,
-                    backgroundImage: null,
+                    backgroundImage: null, backgroundSize: 'cover',
                     featherRadius: 0,
                     shadowSettings: mockShadowSettings,
                     edgeRefinement: mockEdgeRefinement,
