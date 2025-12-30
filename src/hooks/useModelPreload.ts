@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { backgroundRemovalService } from '../services/backgroundRemovalService';
 
 export interface PreloadState {
@@ -36,13 +36,17 @@ export function useModelPreload(): PreloadState {
         progress: 0,
         error: null,
     });
+    
+    // Use ref to avoid stale closure issues
+    const isPreloadingRef = useRef(false);
 
     const startPreload = useCallback(async () => {
         // Skip if already preloaded or currently preloading
-        if (backgroundRemovalService.preloaded || state.isPreloading) {
+        if (backgroundRemovalService.preloaded || isPreloadingRef.current) {
             return;
         }
-
+        
+        isPreloadingRef.current = true;
         setState(prev => ({ ...prev, isPreloading: true, error: null }));
 
         try {
@@ -56,6 +60,7 @@ export function useModelPreload(): PreloadState {
                 isPreloaded: true,
                 progress: 100,
             }));
+            isPreloadingRef.current = false;
 
             console.log('[ModelPreload] Assets preloaded successfully');
         } catch (error) {
@@ -69,8 +74,9 @@ export function useModelPreload(): PreloadState {
                 isPreloading: false,
                 error: errorMessage,
             }));
+            isPreloadingRef.current = false;
         }
-    }, [state.isPreloading]);
+    }, []); // No dependencies - uses refs to avoid stale closures
 
     useEffect(() => {
         // Start preloading after a short delay to not block initial render

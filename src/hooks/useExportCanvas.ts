@@ -42,8 +42,9 @@ export interface ExportCanvasOptions {
 
 /**
  * Creates an export canvas with all effects applied (background, shadow, feathering, edge refinement)
+ * Returns a Promise to properly handle async background image loading
  */
-function createExportCanvas(
+async function createExportCanvas(
     sourceCanvas: HTMLCanvasElement,
     options: {
         backgroundColor: string | null;
@@ -55,7 +56,7 @@ function createExportCanvas(
         includeJpegBackground?: boolean;
         originalImage?: HTMLImageElement | null;
     }
-): HTMLCanvasElement | null {
+): Promise<HTMLCanvasElement | null> {
     const { backgroundColor, backgroundImage, featherRadius, shadowSettings, edgeRefinement, exportFormat, includeJpegBackground = true, originalImage } = options;
 
     // First, apply edge refinement to the source canvas if enabled
@@ -107,21 +108,23 @@ function createExportCanvas(
         ctx.fillStyle = backgroundColor;
         ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
     } else if (backgroundImage) {
-        // Load and draw background image synchronously for export
-        const bgImg = new Image();
-        bgImg.src = backgroundImage;
-        // Background image should already be loaded from the picker
-        if (bgImg.complete) {
-            const scale = Math.max(
-                exportCanvas.width / bgImg.width,
-                exportCanvas.height / bgImg.height
-            );
-            const scaledWidth = bgImg.width * scale;
-            const scaledHeight = bgImg.height * scale;
-            const x = (exportCanvas.width - scaledWidth) / 2;
-            const y = (exportCanvas.height - scaledHeight) / 2;
-            ctx.drawImage(bgImg, x, y, scaledWidth, scaledHeight);
-        }
+        // Load background image asynchronously to ensure it's ready
+        const bgImg = await new Promise<HTMLImageElement>((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = () => reject(new Error('Failed to load background image'));
+            img.src = backgroundImage;
+        });
+        
+        const scale = Math.max(
+            exportCanvas.width / bgImg.width,
+            exportCanvas.height / bgImg.height
+        );
+        const scaledWidth = bgImg.width * scale;
+        const scaledHeight = bgImg.height * scale;
+        const x = (exportCanvas.width - scaledWidth) / 2;
+        const y = (exportCanvas.height - scaledHeight) / 2;
+        ctx.drawImage(bgImg, x, y, scaledWidth, scaledHeight);
     }
 
     // Draw shadow/glow effect if enabled
@@ -190,65 +193,70 @@ export function useExportCanvas({
     exportQuality,
     onDownloadComplete,
 }: UseExportCanvasProps) {
-    const handleDownload = useCallback(() => {
+    const handleDownload = useCallback(async () => {
         const osc = refs.offscreenCanvasRef.current;
         if (!osc) return;
 
-        const exportCanvas = createExportCanvas(osc, {
-            backgroundColor,
-            backgroundImage,
-            featherRadius,
-            shadowSettings,
-            edgeRefinement,
-            exportFormat,
-            includeJpegBackground: true,
-        });
-        if (!exportCanvas) return;
+        try {
+            const exportCanvas = await createExportCanvas(osc, {
+                backgroundColor,
+                backgroundImage,
+                featherRadius,
+                shadowSettings,
+                edgeRefinement,
+                exportFormat,
+                includeJpegBackground: true,
+            });
+            if (!exportCanvas) return;
 
-        // Determine MIME type and file extension
-        const mimeTypes: Record<ExportFormat, string> = {
-            png: 'image/png',
-            jpeg: 'image/jpeg',
-            webp: 'image/webp',
-        };
-        const extensions: Record<ExportFormat, string> = {
-            png: 'png',
-            jpeg: 'jpg',
-            webp: 'webp',
-        };
+            // Determine MIME type and file extension
+            const mimeTypes: Record<ExportFormat, string> = {
+                png: 'image/png',
+                jpeg: 'image/jpeg',
+                webp: 'image/webp',
+            };
+            const extensions: Record<ExportFormat, string> = {
+                png: 'png',
+                jpeg: 'jpg',
+                webp: 'webp',
+            };
 
-        // Download
-        const link = document.createElement('a');
-        const baseName = backgroundColor || backgroundImage
-            ? 'image-with-background'
-            : 'removed-background';
-        link.download = `${baseName}.${extensions[exportFormat]}`;
-        link.href = exportFormat === 'png'
-            ? exportCanvas.toDataURL(mimeTypes[exportFormat])
-            : exportCanvas.toDataURL(mimeTypes[exportFormat], exportQuality);
-        link.click();
-        toast.success('Image downloaded');
-        onDownloadComplete?.();
+            // Download
+            const link = document.createElement('a');
+            const baseName = backgroundColor || backgroundImage
+                ? 'image-with-background'
+                : 'removed-background';
+            link.download = `${baseName}.${extensions[exportFormat]}`;
+            link.href = exportFormat === 'png'
+                ? exportCanvas.toDataURL(mimeTypes[exportFormat])
+                : exportCanvas.toDataURL(mimeTypes[exportFormat], exportQuality);
+            link.click();
+            toast.success('Image downloaded');
+            onDownloadComplete?.();
+        } catch (err) {
+            console.error('Failed to export image:', err);
+            toast.error('Failed to download image');
+        }
     }, [refs, backgroundColor, backgroundImage, featherRadius, shadowSettings, edgeRefinement, exportFormat, exportQuality, onDownloadComplete]);
 
     const handleCopyToClipboard = useCallback(async () => {
         const osc = refs.offscreenCanvasRef.current;
         if (!osc) return;
 
-        // Always use PNG for clipboard (supports transparency)
-        const exportCanvas = createExportCanvas(osc, {
-            backgroundColor,
-            backgroundImage,
-            featherRadius,
-            shadowSettings,
-            edgeRefinement,
-            exportFormat: 'png',
-            includeJpegBackground: false,
-        });
-        if (!exportCanvas) return;
-
-        // Copy to clipboard
         try {
+            // Always use PNG for clipboard (supports transparency)
+            const exportCanvas = await createExportCanvas(osc, {
+                backgroundColor,
+                backgroundImage,
+                featherRadius,
+                shadowSettings,
+                edgeRefinement,
+                exportFormat: 'png',
+                includeJpegBackground: false,
+            });
+            if (!exportCanvas) return;
+
+            // Copy to clipboard
             const blob = await new Promise<Blob | null>((resolve) =>
                 exportCanvas.toBlob(resolve, 'image/png')
             );

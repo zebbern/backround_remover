@@ -23,6 +23,8 @@ import { KeyboardShortcutsHelp } from './components/KeyboardShortcutsHelp';
 import { useAppStore } from './store/useAppStore';
 import { useBackgroundRemoval } from './hooks/useBackgroundRemoval';
 import { useModelPreload } from './hooks/useModelPreload';
+import { resizeImageIfNeeded, formatDimensions, MAX_IMAGE_DIMENSION } from './utils/imageResize';
+import { toast } from './store/useToastStore';
 import { Github } from 'lucide-react';
 
 function App() {
@@ -42,7 +44,7 @@ function App() {
   const setOriginalImage = useAppStore((state) => state.setOriginalImage);
 
   // Global paste handler (Ctrl+V)
-  const handlePaste = useCallback((e: ClipboardEvent) => {
+  const handlePaste = useCallback(async (e: ClipboardEvent) => {
     // Don't handle paste if already processing or in an input field
     if (isProcessing) return;
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -55,13 +57,34 @@ function App() {
         e.preventDefault();
         const file = item.getAsFile();
         if (file) {
-          const url = URL.createObjectURL(file);
-          setOriginalImage(url);
+          try {
+            // Read file as data URL
+            const reader = new FileReader();
+            const dataUrl = await new Promise<string>((resolve, reject) => {
+              reader.onload = () => resolve(reader.result as string);
+              reader.onerror = () => reject(new Error('Failed to read pasted image'));
+              reader.readAsDataURL(file);
+            });
+            
+            // Apply same resize logic as ImageUploader
+            const resizeResult = await resizeImageIfNeeded(dataUrl, MAX_IMAGE_DIMENSION);
+            
+            if (resizeResult.wasResized) {
+              toast.info(
+                `Image resized from ${formatDimensions(resizeResult.originalDimensions)} to ${formatDimensions(resizeResult.newDimensions)} for optimal performance`
+              );
+            }
+            
+            setOriginalImage(resizeResult.dataUrl);
+          } catch (err) {
+            console.error('Paste failed:', err);
+            setError('Failed to process pasted image');
+          }
         }
         break;
       }
     }
-  }, [isProcessing, setOriginalImage]);
+  }, [isProcessing, setOriginalImage, setError]);
 
   useEffect(() => {
     document.addEventListener('paste', handlePaste);
