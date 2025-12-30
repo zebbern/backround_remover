@@ -14,18 +14,32 @@
  * limitations under the License.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 export function useGitHubStarToast() {
     const [showToast, setShowToast] = useState(false);
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const triggerToast = useCallback(() => {
+        // Clear any existing timer
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+        }
         // Show toast after a short delay (e.g., after download)
-        setTimeout(() => setShowToast(true), 1000);
+        timerRef.current = setTimeout(() => setShowToast(true), 1000);
     }, []);
 
     const closeToast = useCallback(() => {
         setShowToast(false);
+    }, []);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+            }
+        };
     }, []);
 
     return {

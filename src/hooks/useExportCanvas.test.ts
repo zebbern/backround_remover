@@ -18,7 +18,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useExportCanvas } from './useExportCanvas';
 import type { CanvasRefs } from './useCanvasRenderer';
-import type { ShadowSettings } from '../store/useAppStore';
+import type { ShadowSettings, EdgeRefinementSettings } from '../store/useAppStore';
 
 // Mock the toast store
 vi.mock('../store/useToastStore', () => ({
@@ -31,6 +31,7 @@ vi.mock('../store/useToastStore', () => ({
 describe('useExportCanvas', () => {
     let mockRefs: CanvasRefs;
     let mockShadowSettings: ShadowSettings;
+    let mockEdgeRefinement: EdgeRefinementSettings;
     let originalCreateElement: typeof document.createElement;
 
     beforeEach(() => {
@@ -46,6 +47,13 @@ describe('useExportCanvas', () => {
             offsetX: 5,
             offsetY: 5,
             spread: 5,
+        };
+
+        mockEdgeRefinement = {
+            mode: 'off',
+            edgeContrast: 50,
+            edgeSoftness: 30,
+            colorDecontamination: 0,
         };
 
         // Create a minimal mock canvas using the real createElement
@@ -73,6 +81,7 @@ describe('useExportCanvas', () => {
                 backgroundImage: null,
                 featherRadius: 0,
                 shadowSettings: mockShadowSettings,
+                edgeRefinement: mockEdgeRefinement,
                 exportFormat: 'png',
                 exportQuality: 0.92,
             })
@@ -90,6 +99,7 @@ describe('useExportCanvas', () => {
                 backgroundImage: null,
                 featherRadius: 0,
                 shadowSettings: mockShadowSettings,
+                edgeRefinement: mockEdgeRefinement,
                 exportFormat: 'png',
                 exportQuality: 0.92,
             })
@@ -115,6 +125,7 @@ describe('useExportCanvas', () => {
                 backgroundImage: null,
                 featherRadius: 0,
                 shadowSettings: mockShadowSettings,
+                edgeRefinement: mockEdgeRefinement,
                 exportFormat: 'png',
                 exportQuality: 0.92,
             })
@@ -133,6 +144,7 @@ describe('useExportCanvas', () => {
                 backgroundImage: null,
                 featherRadius: 0,
                 shadowSettings: mockShadowSettings,
+                edgeRefinement: mockEdgeRefinement,
                 exportFormat: 'png',
                 exportQuality: 0.92,
             })
@@ -154,6 +166,7 @@ describe('useExportCanvas', () => {
                 backgroundImage: null,
                 featherRadius: 0,
                 shadowSettings: shadowWithDropShadow,
+                edgeRefinement: mockEdgeRefinement,
                 exportFormat: 'png',
                 exportQuality: 0.92,
             })
@@ -175,6 +188,7 @@ describe('useExportCanvas', () => {
                 backgroundImage: null,
                 featherRadius: 0,
                 shadowSettings: shadowWithGlow,
+                edgeRefinement: mockEdgeRefinement,
                 exportFormat: 'png',
                 exportQuality: 0.92,
             })
@@ -191,6 +205,7 @@ describe('useExportCanvas', () => {
                 backgroundImage: null,
                 featherRadius: 10,
                 shadowSettings: mockShadowSettings,
+                edgeRefinement: mockEdgeRefinement,
                 exportFormat: 'png',
                 exportQuality: 0.92,
             })
@@ -210,6 +225,7 @@ describe('useExportCanvas', () => {
                     backgroundImage: null,
                     featherRadius: 0,
                     shadowSettings: mockShadowSettings,
+                    edgeRefinement: mockEdgeRefinement,
                     exportFormat: format,
                     exportQuality: 0.92,
                 })

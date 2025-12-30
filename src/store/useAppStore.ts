@@ -279,7 +279,14 @@ export const useAppStore = create<AppState>((set, get) => ({
         });
     },
 
-    setBackgroundColor: (color) => set({ backgroundColor: color, backgroundImage: null }),
+    setBackgroundColor: (color) => {
+        const state = get();
+        // Cleanup previous background image blob URL when switching to color
+        if (state.backgroundImage?.startsWith('blob:')) {
+            URL.revokeObjectURL(state.backgroundImage);
+        }
+        set({ backgroundColor: color, backgroundImage: null });
+    },
     setBackgroundImage: (image) => {
         const state = get();
         // Cleanup previous background image blob URL
