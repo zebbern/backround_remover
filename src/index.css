@@ -33,10 +33,78 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  /* 3D Perspective System */
+  --perspective: 1200px;
+  --perspective-origin: center center;
+  
+  /* Glass Effect Variables */
+  --glass-bg: rgba(24, 24, 27, 0.4);
+  --glass-border: rgba(63, 63, 70, 0.3);
+  --glass-blur: 24px;
+  
+  /* Depth Layers */
+  --z-base: 0px;
+  --z-canvas: 20px;
+  --z-controls: 40px;
+  --z-modal: 60px;
+  
+  /* Shadow System */
+  --shadow-glow: 0 0 20px rgba(132, 204, 22, 0.1);
+  --shadow-depth: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  background-size: 200% 200%;
+  animation: gradient 15s ease infinite;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Glass utility classes */
+@layer utilities {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+  }
+  
+  .glass-strong {
+    background: rgba(24, 24, 27, 0.6);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(63, 63, 70, 0.5);
+  }
+  
+  .perspective-container {
+    perspective: var(--perspective);
+    perspective-origin: var(--perspective-origin);
+  }
+  
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow), var(--shadow-depth);
+  }
+  
+  .shadow-glow-strong {
+    box-shadow: 0 0 30px rgba(132, 204, 22, 0.2), var(--shadow-elevated);
+  }
 }
