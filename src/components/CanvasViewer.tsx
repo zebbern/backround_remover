@@ -499,15 +499,18 @@ export const CanvasViewer: React.FC = () => {
                     }}
                 />
 
-                <div
-                    style={{
-                        transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
-                        transformOrigin: 'center',
-                        transition: (isDragging || isTouching) ? 'none' : 'transform 0.1s ease-out',
-                    }}
-                    className="w-full h-full flex items-center justify-center"
-                >
-                    <canvas ref={canvasRef} className="relative z-10" />
+                <div className="relative inline-block glass-strong rounded-2xl p-4 shadow-glow-strong preserve-3d"
+                     style={{ transform: 'translateZ(var(--z-canvas))' }}>
+                    <div
+                        style={{
+                            transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
+                            transformOrigin: 'center',
+                            transition: (isDragging || isTouching) ? 'none' : 'transform 0.1s ease-out',
+                        }}
+                        className="relative rounded-xl overflow-hidden border border-zinc-700/30"
+                    >
+                        <canvas ref={canvasRef} className="relative z-10" />
+                    </div>
                 </div>
 
                 {/* Cursor canvas - outside transform to stay fixed to mouse position */}
