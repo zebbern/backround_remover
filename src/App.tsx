@@ -92,7 +92,8 @@ function App() {
   }, [handlePaste]);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 selection:bg-lime-500/30">
+    <div className="min-h-screen text-zinc-100 selection:bg-lime-500/30 perspective-container">
+      <div className="app-container preserve-3d">
       {/* Error Banner */}
       {error && (
         <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-red-500/10 border border-red-500 text-red-400 px-6 py-3 rounded-lg flex items-center gap-4 shadow-lg backdrop-blur-sm">
@@ -215,6 +216,7 @@ function App() {
 
       {/* Keyboard Shortcuts Help */}
       <KeyboardShortcutsHelp />
+      </div>
     </div>
   );
 }
