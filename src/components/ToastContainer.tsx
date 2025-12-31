@@ -55,10 +55,15 @@ export const ToastContainer: React.FC = () => {
                     role="status"
                     aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
                     className={clsx(
-                        "pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg backdrop-blur-sm",
-                        "animate-in slide-in-from-bottom-2 fade-in duration-200",
+                        "glass-strong rounded-xl px-4 py-3 shadow-glow-strong preserve-3d",
+                        "pointer-events-auto flex items-center gap-3",
+                        "animate-in slide-in-from-right duration-300",
                         styleMap[toast.type]
                     )}
+                    style={{ 
+                        transform: 'translateZ(var(--z-modal))',
+                        animation: 'slideInToast 0.3s ease-out'
+                    }}
                 >
                     <div className={clsx("p-1.5 rounded-full", iconStyleMap[toast.type])} aria-hidden="true">
                         {iconMap[toast.type]}
@@ -66,7 +71,7 @@ export const ToastContainer: React.FC = () => {
                     <span className="text-sm font-medium text-zinc-100">{toast.message}</span>
                     <button
                         onClick={() => removeToast(toast.id)}
-                        className="p-1 text-zinc-500 hover:text-zinc-300 rounded transition-colors ml-2"
+                        className="interactive-3d p-1 text-zinc-500 hover:text-zinc-300 rounded hover:rotate-90 transition-all duration-200 ml-2"
                         aria-label={`Dismiss notification: ${toast.message}`}
                     >
                         <X className="w-3.5 h-3.5" />
