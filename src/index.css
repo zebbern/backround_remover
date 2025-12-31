@@ -117,3 +117,58 @@ body {
     box-shadow: 0 0 30px rgba(132, 204, 22, 0.2), var(--shadow-elevated);
   }
 }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes slideInToast {
+  from {
+    transform: translateX(100%) translateZ(var(--z-modal)) rotateY(15deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) translateZ(var(--z-modal)) rotateY(0);
+    opacity: 1;
+  }
+}
+
+/* Performance optimizations */
+.interactive-3d,
+.glass,
+.glass-strong {
+  will-change: transform;
+}
+
+/* Ripple effect for clicks */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(132, 204, 22, 0.3);
+  width: 20px;
+  height: 20px;
+  animation: ripple 0.6s ease-out;
+  pointer-events: none;
+}

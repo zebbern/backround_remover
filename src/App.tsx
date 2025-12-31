@@ -138,7 +138,8 @@ function App() {
       )}
 
       {/* Header */}
-      <header className="mb-12 relative">
+      <header className="mb-12 relative animate-fade-in-up" 
+              style={{ animationDelay: '0.1s' }}>
         <div className="glass rounded-2xl p-6 shadow-glow interactive-3d" 
              style={{ transform: 'translateZ(var(--z-controls))' }}>
           <div className="flex items-center justify-between">
@@ -165,7 +166,8 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 min-h-[calc(100vh-8rem)]">
+      <main className="max-w-7xl mx-auto px-4 py-8 min-h-[calc(100vh-8rem)] animate-fade-in-up" 
+            style={{ animationDelay: '0.2s' }}>
         {!originalImage ? (
           <div className="max-w-2xl mx-auto space-y-12 pt-12">
             <div className="text-center space-y-4">
