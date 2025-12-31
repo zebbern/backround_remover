@@ -26,8 +26,9 @@ export const GitHubStarToast: React.FC<GitHubStarToastProps> = ({ show, onClose 
     if (!show) return null;
 
     return (
-        <div className="fixed bottom-8 right-8 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
-            <div className="bg-zinc-900 text-zinc-100 p-4 rounded-xl shadow-2xl flex items-center gap-4 max-w-sm border border-zinc-800 ring-1 ring-lime-500/20">
+        <div className="fixed bottom-8 right-8 z-50 animate-in slide-in-from-bottom fade-in duration-500">
+            <div className="glass-strong text-zinc-100 p-4 rounded-2xl shadow-glow-strong preserve-3d flex items-center gap-4 max-w-sm border border-zinc-700/30 ring-1 ring-lime-500/20"
+                 style={{ transform: 'translateZ(var(--z-modal))' }}>
                 <div className="flex-1">
                     <p className="font-semibold text-sm">Happy with the result?</p>
                     <p className="text-xs text-zinc-400 mt-0.5">Support us with a star on GitHub! ⭐</p>
@@ -37,13 +38,13 @@ export const GitHubStarToast: React.FC<GitHubStarToastProps> = ({ show, onClose 
                         href="https://github.com/Suvink/cut-it-out"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 bg-lime-500 text-black text-xs font-bold rounded-lg hover:bg-lime-400 transition-colors"
+                        className="interactive-3d hover:scale-105 glass rounded-xl px-6 py-3 bg-lime-500 text-black text-xs font-bold hover:bg-lime-400 hover:border-lime-500/50 hover:shadow-glow transition-all duration-300"
                     >
                         Star
                     </a>
                     <button
                         onClick={onClose}
-                        className="p-1.5 text-zinc-500 hover:text-zinc-300 rounded-lg transition-colors"
+                        className="interactive-3d p-1.5 text-zinc-500 hover:text-zinc-300 rounded-lg hover:rotate-90 transition-all duration-200"
                         aria-label="Dismiss"
                     >
                         <X className="w-4 h-4" />
