@@ -73,18 +73,19 @@ export const KeyboardShortcutsHelp: React.FC = () => {
             {/* Modal overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                    className="fixed inset-0 backdrop-blur-xl bg-zinc-950/80 z-50 flex items-center justify-center p-4"
                     onClick={() => setIsOpen(false)}
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="shortcuts-title"
                 >
                     <div
-                        className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden"
+                        className="glass-strong rounded-3xl p-8 max-w-2xl mx-auto shadow-glow-strong preserve-3d animate-in zoom-in-95 duration-300 w-full max-h-[80vh] overflow-hidden"
+                        style={{ transform: 'translateZ(var(--z-modal))' }}
                         onClick={e => e.stopPropagation()}
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+                        <div className="flex items-center justify-between pb-4 border-b border-white/10">
                             <h2 id="shortcuts-title" className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
                                 <Keyboard className="w-5 h-5 text-lime-400" />
                                 Keyboard Shortcuts
@@ -99,7 +100,7 @@ export const KeyboardShortcutsHelp: React.FC = () => {
                         </div>
 
                         {/* Shortcuts list */}
-                        <div className="p-4 overflow-y-auto max-h-[60vh]">
+                        <div className="py-4 overflow-y-auto max-h-[60vh]">
                             <ul className="space-y-3" role="list">
                                 {shortcuts.map((shortcut, index) => (
                                     <li key={index} className="flex items-center justify-between gap-4">
@@ -122,7 +123,7 @@ export const KeyboardShortcutsHelp: React.FC = () => {
                         </div>
 
                         {/* Footer */}
-                        <div className="p-4 border-t border-zinc-800 bg-zinc-950/50">
+                        <div className="pt-4 border-t border-white/10">
                             <p className="text-xs text-zinc-500 text-center">
                                 Press <kbd className="px-1.5 py-0.5 bg-zinc-800 border border-zinc-700 rounded text-zinc-400 font-mono">?</kbd> to toggle this dialog
                             </p>
