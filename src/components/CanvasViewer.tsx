@@ -468,7 +468,7 @@ export const CanvasViewer: React.FC = () => {
             {/* Canvas Container */}
             <div
                 ref={containerRef}
-                className="relative w-full h-[65vh] bg-zinc-900/50 rounded-xl overflow-hidden shadow-inner border border-zinc-800 touch-none"
+                className="relative w-full h-[65vh] bg-zinc-900/50 rounded-xl overflow-hidden shadow-inner border border-zinc-800 touch-none flex items-center justify-center"
                 style={{ cursor: isCropping ? getCursor() : 'crosshair' }}
                 onWheel={handleWheel}
                 onMouseDown={handleMouseDown}
@@ -505,9 +505,9 @@ export const CanvasViewer: React.FC = () => {
                         transformOrigin: 'center',
                         transition: (isDragging || isTouching) ? 'none' : 'transform 0.1s ease-out',
                     }}
-                    className="relative"
+                    className="relative z-10"
                 >
-                    <canvas ref={canvasRef} className="relative z-10" />
+                    <canvas ref={canvasRef} />
                 </div>
 
                 {/* Cursor canvas - outside transform to stay fixed to mouse position */}
