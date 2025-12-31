@@ -126,7 +126,7 @@ export const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
                     />
                     
                     {/* Dropdown */}
-                    <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 z-50 bg-zinc-900 rounded-xl border border-zinc-800 shadow-xl p-4 min-w-[280px]">
+                    <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 z-50 glass rounded-2xl shadow-glow p-4 min-w-[280px]">
                         <div className="flex items-center justify-between mb-3">
                             <span className="text-sm font-medium text-zinc-200">Background</span>
                             {hasBackground && (
@@ -149,7 +149,7 @@ export const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
                                         key={index}
                                         onClick={() => handleColorSelect(color)}
                                         className={clsx(
-                                            "w-7 h-7 rounded-lg border-2 transition-all hover:scale-110",
+                                            "w-7 h-7 rounded-lg border-2 transition-all hover:scale-110 interactive-3d",
                                             backgroundColor === color && !backgroundImage
                                                 ? "border-lime-500 ring-2 ring-lime-500/30"
                                                 : "border-zinc-700 hover:border-zinc-500"
@@ -191,7 +191,7 @@ export const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
                                 />
                                 <button
                                     onClick={handleCustomColorApply}
-                                    className="px-3 py-2 bg-lime-500 hover:bg-lime-400 text-black text-sm font-medium rounded-lg transition-colors"
+                                    className="px-3 py-2 bg-lime-500 hover:bg-lime-400 text-black text-sm font-medium rounded-lg transition-colors interactive-3d"
                                 >
                                     Apply
                                 </button>
@@ -203,7 +203,7 @@ export const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
                             <span className="text-xs text-zinc-500 mb-2 block">Custom Image</span>
                             <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 border-dashed rounded-lg text-sm text-zinc-300 transition-colors"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 border-dashed rounded-lg text-sm text-zinc-300 transition-colors interactive-3d"
                             >
                                 <ImagePlus className="w-5 h-5" />
                                 Upload Background Image
@@ -245,7 +245,7 @@ export const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
                                                 key={size}
                                                 onClick={() => onSizeChange(size)}
                                                 className={clsx(
-                                                    "px-2 py-1.5 rounded text-xs font-medium transition-colors capitalize",
+                                                    "px-2 py-1.5 rounded text-xs font-medium transition-colors capitalize interactive-3d",
                                                     backgroundSize === size
                                                         ? "bg-lime-500/20 text-lime-400"
                                                         : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"

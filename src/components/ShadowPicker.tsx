@@ -69,7 +69,7 @@ export const ShadowPicker: React.FC<ShadowPickerProps> = ({
             </button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 w-72 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+                <div className="absolute top-full left-0 mt-2 w-72 glass rounded-2xl shadow-glow z-50 overflow-hidden">
                     <div className="p-4 space-y-4">
                         <h3 className="text-sm font-medium text-zinc-300">Shadow & Glow Effects</h3>
 
@@ -81,7 +81,7 @@ export const ShadowPicker: React.FC<ShadowPickerProps> = ({
                                     <button
                                         key={type}
                                         onClick={() => onShadowChange({ type })}
-                                        className={`flex-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                        className={`flex-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors interactive-3d ${
                                             shadowSettings.type === type
                                                 ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
                                                 : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
@@ -120,7 +120,7 @@ export const ShadowPicker: React.FC<ShadowPickerProps> = ({
                                                     <button
                                                         key={color}
                                                         onClick={() => onShadowChange({ color })}
-                                                        className="w-6 h-6 rounded border border-zinc-700 hover:scale-110 transition-transform"
+                                                        className="w-6 h-6 rounded border border-zinc-700 hover:scale-110 transition-transform interactive-3d"
                                                         style={{ backgroundColor: color }}
                                                     />
                                                 ))
@@ -128,7 +128,7 @@ export const ShadowPicker: React.FC<ShadowPickerProps> = ({
                                                     <button
                                                         key={color}
                                                         onClick={() => onShadowChange({ color })}
-                                                        className="w-6 h-6 rounded border border-zinc-700 hover:scale-110 transition-transform"
+                                                        className="w-6 h-6 rounded border border-zinc-700 hover:scale-110 transition-transform interactive-3d"
                                                         style={{ backgroundColor: color }}
                                                     />
                                                 ))
@@ -149,7 +149,7 @@ export const ShadowPicker: React.FC<ShadowPickerProps> = ({
                                         max="50"
                                         value={shadowSettings.blur}
                                         onChange={(e) => onShadowChange({ blur: Number(e.target.value) })}
-                                        className="w-full accent-purple-500"
+                                        className="w-full accent-purple-500 interactive-3d"
                                     />
                                 </div>
 
@@ -169,7 +169,7 @@ export const ShadowPicker: React.FC<ShadowPickerProps> = ({
                                                     max="50"
                                                     value={shadowSettings.offsetX}
                                                     onChange={(e) => onShadowChange({ offsetX: Number(e.target.value) })}
-                                                    className="w-full accent-purple-500"
+                                                    className="w-full accent-purple-500 interactive-3d"
                                                 />
                                             </div>
                                             <div>
@@ -180,7 +180,7 @@ export const ShadowPicker: React.FC<ShadowPickerProps> = ({
                                                     max="50"
                                                     value={shadowSettings.offsetY}
                                                     onChange={(e) => onShadowChange({ offsetY: Number(e.target.value) })}
-                                                    className="w-full accent-purple-500"
+                                                    className="w-full accent-purple-500 interactive-3d"
                                                 />
                                             </div>
                                         </div>
@@ -200,7 +200,7 @@ export const ShadowPicker: React.FC<ShadowPickerProps> = ({
                                             max="20"
                                             value={shadowSettings.spread}
                                             onChange={(e) => onShadowChange({ spread: Number(e.target.value) })}
-                                            className="w-full accent-purple-500"
+                                            className="w-full accent-purple-500 interactive-3d"
                                         />
                                     </div>
                                 )}

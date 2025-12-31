@@ -76,7 +76,7 @@ export const EdgeRefinementPicker: React.FC<EdgeRefinementPickerProps> = ({
                     />
                     
                     {/* Dropdown Panel */}
-                    <div className="absolute top-full left-0 mt-2 w-72 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl z-50 overflow-hidden">
+                    <div className="absolute top-full left-0 mt-2 w-72 glass rounded-2xl shadow-glow z-50 overflow-hidden">
                         <div className="p-3 border-b border-zinc-800">
                             <h3 className="text-sm font-semibold text-zinc-100">Edge Refinement</h3>
                             <p className="text-xs text-zinc-500 mt-0.5">Improve edges for hair & fine details</p>
@@ -91,7 +91,7 @@ export const EdgeRefinementPicker: React.FC<EdgeRefinementPickerProps> = ({
                                         key={mode}
                                         onClick={() => handleModeChange(mode)}
                                         className={clsx(
-                                            "px-2 py-1.5 text-xs font-medium rounded-lg transition-colors",
+                                            "px-2 py-1.5 text-xs font-medium rounded-lg transition-colors interactive-3d",
                                             settings.mode === mode
                                                 ? "bg-lime-500 text-black"
                                                 : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200"
@@ -119,7 +119,7 @@ export const EdgeRefinementPicker: React.FC<EdgeRefinementPickerProps> = ({
                                         max="100"
                                         value={settings.edgeContrast}
                                         onChange={(e) => onChange({ edgeContrast: Number(e.target.value) })}
-                                        className="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer
+                                        className="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer interactive-3d
                                             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 
                                             [&::-webkit-slider-thumb]:bg-lime-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
                                             [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
@@ -139,7 +139,7 @@ export const EdgeRefinementPicker: React.FC<EdgeRefinementPickerProps> = ({
                                         max="100"
                                         value={settings.edgeSoftness}
                                         onChange={(e) => onChange({ edgeSoftness: Number(e.target.value) })}
-                                        className="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer
+                                        className="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer interactive-3d
                                             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 
                                             [&::-webkit-slider-thumb]:bg-lime-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
                                             [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
@@ -159,7 +159,7 @@ export const EdgeRefinementPicker: React.FC<EdgeRefinementPickerProps> = ({
                                         max="100"
                                         value={settings.colorDecontamination}
                                         onChange={(e) => onChange({ colorDecontamination: Number(e.target.value) })}
-                                        className="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer
+                                        className="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer interactive-3d
                                             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 
                                             [&::-webkit-slider-thumb]:bg-lime-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
                                             [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
