@@ -96,8 +96,8 @@ function App() {
       <div className="app-container preserve-3d">
       {/* Error Banner */}
       {error && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 
-                        glass-strong border-red-500/50 text-red-400 px-6 py-3 rounded-xl 
+        <div className="fixed top-20 left-1/2 z-50 
+                        glass-strong border border-red-500/50 text-red-400 px-6 py-3 rounded-xl 
                         flex items-center gap-4 shadow-glow-strong
                         animate-in slide-in-from-top duration-300"
              style={{ transform: 'translateX(-50%) translateZ(var(--z-modal))' }}>
