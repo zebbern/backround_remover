@@ -182,9 +182,8 @@ function App() {
 
             {/* Preload indicator - shows model is being prepared */}
             {isPreloading && (
-              <div className="glass rounded-xl px-4 py-2 text-sm text-zinc-400 shadow-glow flex items-center justify-center gap-2">
-                <div className="w-3 h-3 border-2 border-lime-500 border-t-transparent rounded-full animate-spin" />
-                <span>Loading AI model... {Math.round(preloadProgress)}%</span>
+              <div className="glass rounded-xl px-4 py-2 text-sm text-zinc-400 shadow-glow mb-4">
+                Loading AI model... {Math.round(preloadProgress)}%
               </div>
             )}
 
