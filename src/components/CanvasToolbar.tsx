@@ -126,11 +126,11 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                 {/* Top Row - Essential Controls */}
                 <div className="flex flex-wrap items-center gap-2">
                     {/* Brush Size Control */}
-                    <div className="glass-strong flex items-center gap-2 px-2 py-1 rounded-lg">
+                    <div className="glass-strong flex items-center gap-2 px-2 py-1 rounded-xl">
                         <span className="text-xs font-medium text-zinc-500">Brush</span>
                         <button
                             onClick={() => onBrushSizeChange(Math.max(brushSize - 10, 10))}
-                            className="p-1.5 rounded text-zinc-400 hover:text-lime-400 transition-all duration-200 interactive-3d hover:bg-zinc-800/50 touch-manipulation"
+                            className="px-3 py-2 rounded-xl text-zinc-400 hover:text-lime-400 transition-all duration-200 interactive-3d hover:bg-zinc-800/50 touch-manipulation"
                             title="Decrease size ([)"
                             aria-label="Decrease brush size"
                         >
@@ -139,7 +139,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                         <span className="w-7 text-center font-mono text-sm text-zinc-200">{brushSize}</span>
                         <button
                             onClick={() => onBrushSizeChange(Math.min(brushSize + 10, 200))}
-                            className="p-1.5 rounded text-zinc-400 hover:text-lime-400 transition-all duration-200 interactive-3d hover:bg-zinc-800/50 touch-manipulation"
+                            className="px-3 py-2 rounded-xl text-zinc-400 hover:text-lime-400 transition-all duration-200 interactive-3d hover:bg-zinc-800/50 touch-manipulation"
                             title="Increase size (])"
                             aria-label="Increase brush size"
                         >
@@ -148,11 +148,11 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                     </div>
 
                     {/* Brush Mode Toggle */}
-                    <div className="glass-strong flex items-center gap-1 rounded-lg p-1">
+                    <div className="glass-strong flex items-center gap-1 rounded-xl p-1">
                         <button
                             onClick={() => onBrushModeChange('erase')}
                             className={clsx(
-                                "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm font-medium transition-all duration-200 interactive-3d touch-manipulation",
+                                "flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 interactive-3d touch-manipulation",
                                 brushMode === 'erase'
                                     ? "bg-red-500/20 text-red-400 border border-red-500/50"
                                     : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
@@ -166,7 +166,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                         <button
                             onClick={() => onBrushModeChange('restore')}
                             className={clsx(
-                                "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm font-medium transition-all duration-200 interactive-3d touch-manipulation",
+                                "flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 interactive-3d touch-manipulation",
                                 brushMode === 'restore'
                                     ? "bg-lime-500/20 text-lime-400 border border-lime-500/50"
                                     : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
@@ -180,11 +180,11 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                     </div>
 
                     {/* Instant Apply Toggle & Pending Strokes Actions */}
-                    <div className="glass-strong flex items-center gap-1 rounded-lg p-1">
+                    <div className="glass-strong flex items-center gap-1 rounded-xl p-1">
                         <button
                             onClick={() => onInstantApplyChange(!instantApply)}
                             className={clsx(
-                                "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm font-medium transition-all duration-200 interactive-3d touch-manipulation",
+                                "flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 interactive-3d touch-manipulation",
                                 instantApply
                                     ? "bg-amber-500/20 text-amber-400 border border-amber-500/50"
                                     : "bg-cyan-500/20 text-cyan-400 border border-cyan-500/50"
@@ -201,7 +201,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                             <>
                                 <button
                                     onClick={onCommitStrokes}
-                                    className="flex items-center gap-1 px-2.5 py-1.5 rounded text-sm font-medium bg-lime-500/20 text-lime-400 hover:bg-lime-500/30 border border-lime-500/50 hover:border-lime-500 hover:shadow-glow transition-all duration-200 interactive-3d touch-manipulation"
+                                    className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium bg-lime-500/20 text-lime-400 hover:bg-lime-500/30 border border-lime-500/50 hover:border-lime-500 hover:shadow-glow transition-all duration-200 interactive-3d touch-manipulation"
                                     title="Apply Changes (Enter)"
                                 >
                                     <Check className="w-4 h-4" />
@@ -209,7 +209,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                                 </button>
                                 <button
                                     onClick={onClearPendingStrokes}
-                                    className="flex items-center gap-1 px-2.5 py-1.5 rounded text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/50 hover:border-red-500 transition-all duration-200 interactive-3d touch-manipulation"
+                                    className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/50 hover:border-red-500 transition-all duration-200 interactive-3d touch-manipulation"
                                     title="Cancel (Escape)"
                                 >
                                     <X className="w-4 h-4" />
@@ -242,7 +242,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                     />
 
                     {/* Feather Edges Slider */}
-                    <div className="glass-strong flex items-center gap-2 px-2 py-1 rounded-lg">
+                    <div className="glass-strong flex items-center gap-2 px-2 py-1 rounded-xl">
                         <SlidersHorizontal className="w-4 h-4 text-zinc-400" />
                         <input
                             type="range"
@@ -262,7 +262,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                     {!isCropping ? (
                         <button
                             onClick={onStartCrop}
-                            className="glass-strong flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-zinc-400 hover:text-lime-400 hover:border-lime-500/50 hover:shadow-glow transition-all duration-200 interactive-3d touch-manipulation"
+                            className="glass-strong flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-lime-400 hover:border-lime-500/50 hover:shadow-glow transition-all duration-200 interactive-3d touch-manipulation"
                             title="Crop Image (C)"
                         >
                             <Crop className="w-4 h-4" />
@@ -272,14 +272,14 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={onApplyCrop}
-                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm font-medium bg-lime-500/20 text-lime-400 hover:bg-lime-500/30 border border-lime-500/50 hover:border-lime-500 hover:shadow-glow transition-all duration-200 interactive-3d touch-manipulation"
+                                className="glass-strong flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium bg-lime-500/20 text-lime-400 hover:bg-lime-500/30 border border-lime-500/50 hover:border-lime-500 hover:shadow-glow transition-all duration-200 interactive-3d touch-manipulation"
                                 title="Apply Crop (Enter)"
                             >
                                 <Check className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={onCancelCrop}
-                                className="glass-strong flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm font-medium text-zinc-400 hover:bg-zinc-800/50 hover:text-red-400 border hover:border-red-500/50 transition-all duration-200 interactive-3d touch-manipulation"
+                                className="glass-strong flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium text-zinc-400 hover:bg-zinc-800/50 hover:text-red-400 border hover:border-red-500/50 transition-all duration-200 interactive-3d touch-manipulation"
                                 title="Cancel Crop (Escape)"
                             >
                                 <X className="w-4 h-4" />
@@ -291,11 +291,11 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                     <div className="flex-1" />
 
                     {/* Undo/Redo */}
-                    <div className="glass-strong flex items-center gap-0.5 p-1 rounded-lg">
+                    <div className="glass-strong flex items-center gap-0.5 p-1 rounded-xl">
                         <button
                             onClick={onUndo}
                             disabled={!canUndo}
-                            className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 rounded disabled:opacity-30 disabled:hover:bg-transparent transition-all duration-200 interactive-3d touch-manipulation"
+                            className="px-3 py-2 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 rounded-xl disabled:opacity-30 disabled:hover:bg-transparent transition-all duration-200 interactive-3d touch-manipulation"
                             title="Undo (Ctrl+Z)"
                             aria-label="Undo"
                         >
@@ -304,7 +304,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                         <button
                             onClick={onRedo}
                             disabled={!canRedo}
-                            className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 rounded disabled:opacity-30 disabled:hover:bg-transparent transition-all duration-200 interactive-3d touch-manipulation"
+                            className="px-3 py-2 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 rounded-xl disabled:opacity-30 disabled:hover:bg-transparent transition-all duration-200 interactive-3d touch-manipulation"
                             title="Redo (Ctrl+Shift+Z)"
                             aria-label="Redo"
                         >
@@ -313,10 +313,10 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                     </div>
 
                     {/* Zoom Controls */}
-                    <div className="glass-strong flex items-center gap-0.5 p-1 rounded-lg">
+                    <div className="glass-strong flex items-center gap-0.5 p-1 rounded-xl">
                         <button 
                             onClick={onZoomOut} 
-                            className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 rounded transition-all duration-200 interactive-3d touch-manipulation"
+                            className="px-3 py-2 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 rounded-xl transition-all duration-200 interactive-3d touch-manipulation"
                             aria-label="Zoom out"
                             title="Zoom Out"
                         >
@@ -324,7 +324,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                         </button>
                         <button 
                             onClick={onFitToScreen} 
-                            className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 rounded transition-all duration-200 interactive-3d touch-manipulation"
+                            className="px-3 py-2 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 rounded-xl transition-all duration-200 interactive-3d touch-manipulation"
                             aria-label="Fit to screen"
                             title="Fit to Screen (F)"
                         >
@@ -333,7 +333,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                         <span className="w-10 text-center font-mono text-xs text-zinc-400">{Math.round(zoom * 100)}%</span>
                         <button 
                             onClick={onZoomIn} 
-                            className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 rounded transition-all duration-200 interactive-3d touch-manipulation"
+                            className="px-3 py-2 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 rounded-xl transition-all duration-200 interactive-3d touch-manipulation"
                             aria-label="Zoom in"
                             title="Zoom In"
                         >
@@ -347,7 +347,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             <div className="flex flex-wrap justify-between items-center gap-2">
                 <button
                     onClick={onReset}
-                    className="glass-strong px-3 py-2 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50 rounded-lg transition-all duration-200 interactive-3d text-sm font-medium touch-manipulation"
+                    className="glass-strong px-4 py-2.5 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50 rounded-xl transition-all duration-200 interactive-3d text-sm font-medium touch-manipulation"
                 >
                     Start Over
                 </button>
@@ -357,7 +357,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                     <div className="relative">
                         <button
                             onClick={() => setShowFormatMenu(!showFormatMenu)}
-                            className="glass-strong flex items-center gap-1.5 px-3 py-2 text-zinc-200 hover:text-lime-400 hover:border-lime-500/50 hover:shadow-glow rounded-lg text-sm font-medium transition-all duration-200 interactive-3d touch-manipulation"
+                            className="glass-strong flex items-center gap-1.5 px-4 py-2.5 text-zinc-200 hover:text-lime-400 hover:border-lime-500/50 hover:shadow-glow rounded-xl text-sm font-medium transition-all duration-200 interactive-3d touch-manipulation"
                             title="Export format"
                         >
                             {formatLabels[exportFormat]}
@@ -369,7 +369,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                                     className="fixed inset-0 z-40" 
                                     onClick={() => setShowFormatMenu(false)}
                                 />
-                                <div className="absolute right-0 bottom-full mb-2 z-50 glass-strong rounded-lg shadow-glow-strong overflow-hidden min-w-[140px]">
+                                <div className="absolute right-0 bottom-full mb-2 z-50 glass-strong rounded-xl shadow-glow-strong overflow-hidden min-w-[140px]">
                                     {(['png', 'jpeg', 'webp'] as ExportFormat[]).map((format) => (
                                         <button
                                             key={format}
@@ -410,7 +410,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
 
                     <button
                         onClick={onCopyToClipboard}
-                        className="glass-strong flex items-center justify-center gap-1.5 px-3 py-2 text-zinc-200 hover:text-lime-400 hover:border-lime-500/50 hover:shadow-glow rounded-lg font-medium transition-all duration-200 interactive-3d touch-manipulation"
+                        className="glass-strong flex items-center justify-center gap-1.5 px-4 py-2.5 text-zinc-200 hover:text-lime-400 hover:border-lime-500/50 hover:shadow-glow rounded-xl font-medium transition-all duration-200 interactive-3d touch-manipulation"
                         title="Copy to Clipboard"
                     >
                         <Copy className="w-4 h-4" />
@@ -419,7 +419,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
 
                     <button
                         onClick={onDownload}
-                        className="flex items-center justify-center gap-1.5 px-4 py-2 bg-lime-500 hover:bg-lime-400 text-black rounded-lg font-bold transition-all duration-200 shadow-glow-strong hover:shadow-glow-strong interactive-3d touch-manipulation"
+                        className="glass-strong flex items-center justify-center gap-1.5 px-4 py-2.5 bg-lime-500 hover:bg-lime-400 text-black rounded-xl font-bold transition-all duration-200 shadow-glow-strong hover:shadow-glow-strong interactive-3d touch-manipulation"
                     >
                         <Download className="w-4 h-4" />
                         <span className="hidden xs:inline">Download</span>
