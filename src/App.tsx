@@ -135,25 +135,31 @@ function App() {
         </div>
       )}
 
-      <header className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-lime-500 rounded-lg flex items-center justify-center">
-              <img src="/cut-it-out-logo.png" alt="Background Remover Logo" className="w-5 h-5" />
+      {/* Header */}
+      <header className="mb-12 relative">
+        <div className="glass rounded-2xl p-6 shadow-glow interactive-3d" 
+             style={{ transform: 'translateZ(var(--z-controls))' }}>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-zinc-100 via-lime-100 to-zinc-100 bg-clip-text text-transparent">
+                Cut It Out
+              </h1>
+              <p className="text-zinc-400 mt-2 font-light tracking-wide">
+                AI-powered background removal
+              </p>
             </div>
-            <span className="font-bold text-xl tracking-tight text-white">Background Remover</span>
-          </div>
-          <nav className="flex items-center gap-4">
             <a
-              href="https://github.com/zebbern"
+              href="https://github.com/suvink/cut-it-out"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-zinc-100 text-zinc-900 rounded-lg hover:bg-lime-400 hover:text-black transition-all font-medium text-sm"
+              className="glass-strong rounded-xl px-6 py-3 flex items-center gap-3 interactive-3d
+                         hover:border-lime-500/50 hover:shadow-glow-strong transition-all duration-300
+                         group"
             >
-              <Github className="w-4 h-4" />
-              GitHub
+              <Github className="w-5 h-5 transition-transform duration-300 group-hover:rotate-12" />
+              <span className="font-medium">Star on GitHub</span>
             </a>
-          </nav>
+          </div>
         </div>
       </header>
 
