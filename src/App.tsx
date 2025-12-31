@@ -96,11 +96,16 @@ function App() {
       <div className="app-container preserve-3d">
       {/* Error Banner */}
       {error && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-red-500/10 border border-red-500 text-red-400 px-6 py-3 rounded-lg flex items-center gap-4 shadow-lg backdrop-blur-sm">
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 
+                        glass-strong border-red-500/50 text-red-400 px-6 py-3 rounded-xl 
+                        flex items-center gap-4 shadow-glow-strong
+                        animate-in slide-in-from-top duration-300"
+             style={{ transform: 'translateX(-50%) translateZ(var(--z-modal))' }}>
           <span>{error}</span>
           <button
             onClick={() => setError(null)}
-            className="text-red-400 hover:text-red-300 font-bold text-lg"
+            className="text-red-400 hover:text-red-300 transition-all duration-200
+                       hover:scale-110 hover:rotate-90 interactive-3d font-bold text-lg"
             aria-label="Dismiss error"
           >
             ×
