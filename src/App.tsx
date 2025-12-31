@@ -115,26 +115,23 @@ function App() {
 
       {/* Processing Overlay */}
       {isProcessing && (
-        <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm z-40 flex items-center justify-center">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center space-y-4 shadow-xl">
-            <div className="w-16 h-16 mx-auto border-4 border-lime-500 border-t-transparent rounded-full animate-spin" />
-            <div className="space-y-2">
-              <p className="text-xl font-semibold text-white">Processing Image...</p>
-              <p className="text-zinc-400">AI is removing the background</p>
-              {processingProgress > 0 && (
-                <div className="w-64 mx-auto">
-                  <div className="flex justify-between text-sm text-zinc-500 mb-1">
-                    <span>Progress</span>
-                    <span>{processingProgress}%</span>
-                  </div>
-                  <div className="bg-zinc-800 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-lime-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${processingProgress}%` }}
-                    />
-                  </div>
-                </div>
-              )}
+        <div className="fixed inset-0 backdrop-blur-md bg-zinc-950/50 z-40 
+                        flex items-center justify-center">
+          <div className="glass-strong rounded-3xl p-8 shadow-glow-strong preserve-3d"
+               style={{ transform: 'translateZ(var(--z-modal))' }}>
+            <div className="text-center">
+              <div className="animate-glow-pulse text-lime-400 text-lg font-medium mb-4">
+                Processing...
+              </div>
+              <div className="w-64 h-2 bg-zinc-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-lime-500 to-lime-400 transition-all duration-300"
+                  style={{ width: `${processingProgress}%` }}
+                />
+              </div>
+              <div className="text-zinc-400 text-sm mt-2">
+                {processingProgress}%
+              </div>
             </div>
           </div>
         </div>
