@@ -61,8 +61,7 @@ export const ToastContainer: React.FC = () => {
                         styleMap[toast.type]
                     )}
                     style={{ 
-                        transform: 'translateZ(var(--z-modal))',
-                        animation: 'slideInToast 0.3s ease-out'
+                        transform: 'translateZ(var(--z-modal))'
                     }}
                 >
                     <div className={clsx("p-1.5 rounded-full", iconStyleMap[toast.type])} aria-hidden="true">
