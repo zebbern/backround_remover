@@ -420,7 +420,7 @@ export const CanvasViewer: React.FC = () => {
     }, [zoom, setZoom]);
 
     return (
-        <div className="flex flex-col h-full max-w-6xl mx-auto gap-6">
+        <div className="flex flex-col w-full h-full max-w-6xl mx-auto gap-6">
             {/* Toolbar */}
             <CanvasToolbar
                 brushMode={brushMode}
@@ -468,7 +468,7 @@ export const CanvasViewer: React.FC = () => {
             {/* Canvas Container */}
             <div
                 ref={containerRef}
-                className="relative w-full h-[65vh] bg-zinc-900/50 rounded-xl overflow-hidden shadow-inner border border-zinc-800 touch-none flex items-center justify-center"
+                className="relative w-full flex-1 bg-zinc-900/50 rounded-xl overflow-hidden shadow-inner border border-zinc-800 touch-none flex items-center justify-center"
                 style={{ cursor: isCropping ? getCursor() : 'crosshair' }}
                 onWheel={handleWheel}
                 onMouseDown={handleMouseDown}

@@ -166,9 +166,11 @@ function App() {
             )}
           </div>
         ) : (
-          <CanvasErrorBoundary onReset={() => useAppStore.getState().reset()}>
-            <CanvasViewer />
-          </CanvasErrorBoundary>
+          <div className="w-full h-full">
+            <CanvasErrorBoundary onReset={() => useAppStore.getState().reset()}>
+              <CanvasViewer />
+            </CanvasErrorBoundary>
+          </div>
         )}
       </main>
 
