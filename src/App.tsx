@@ -137,37 +137,8 @@ function App() {
         </div>
       )}
 
-      {/* Header */}
-      <header className="mb-12 relative animate-fade-in-up" 
-              style={{ animationDelay: '0.1s' }}>
-        <div className="glass rounded-2xl p-6 shadow-glow interactive-3d" 
-             style={{ transform: 'translateZ(var(--z-controls))' }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-zinc-100 via-lime-100 to-zinc-100 bg-clip-text text-transparent">
-                Backround Remover
-              </h1>
-              <p className="text-zinc-400 mt-2 font-light tracking-wide">
-                AI-powered background removal
-              </p>
-            </div>
-            <a
-              href="https://github.com/zebbern/backround_remover"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="glass-strong rounded-xl px-6 py-3 flex items-center gap-3 interactive-3d
-                         hover:border-lime-500/50 hover:shadow-glow-strong transition-all duration-300
-                         group"
-            >
-              <Github className="w-5 h-5 transition-transform duration-300 group-hover:rotate-12" />
-              <span className="font-medium">Star on GitHub</span>
-            </a>
-          </div>
-        </div>
-      </header>
-
       <main className="max-w-7xl mx-auto px-4 py-8 min-h-[calc(100vh-8rem)] animate-fade-in-up flex items-center" 
-            style={{ animationDelay: '0.2s' }}>
+            style={{ animationDelay: '0.1s' }}>
         {!originalImage ? (
           <div className="max-w-3xl mx-auto space-y-12 w-full">
             {/* Hero Section */}
@@ -202,13 +173,26 @@ function App() {
       </main>
 
       <footer className="py-6 border-t border-zinc-900">
-        <div className="flex items-center justify-center gap-3">
-          <img 
-            src="/zebbern-avatar.png" 
-            alt="zebbern" 
-            className="w-8 h-8 rounded-full border border-zinc-700"
-          />
-          <span className="text-zinc-500 text-sm">Made by <a href="https://github.com/zebbern" target="_blank" rel="noopener noreferrer" className="text-lime-400 hover:text-lime-300 transition-colors">zebbern</a></span>
+        <div className="flex items-center justify-center gap-6">
+          <div className="flex items-center gap-3">
+            <img 
+              src="/zebbern-avatar.png" 
+              alt="zebbern" 
+              className="w-8 h-8 rounded-full border border-zinc-700"
+            />
+            <span className="text-zinc-500 text-sm">Made by <a href="https://github.com/zebbern" target="_blank" rel="noopener noreferrer" className="text-lime-400 hover:text-lime-300 transition-colors">zebbern</a></span>
+          </div>
+          <a
+            href="https://github.com/zebbern/backround_remover"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="glass-strong rounded-xl px-4 py-2 flex items-center gap-2 interactive-3d
+                       hover:border-lime-500/50 hover:shadow-glow transition-all duration-300
+                       group"
+          >
+            <Github className="w-4 h-4 transition-transform duration-300 group-hover:rotate-12" />
+            <span className="font-medium text-sm">Star on GitHub</span>
+          </a>
         </div>
       </footer>
 
