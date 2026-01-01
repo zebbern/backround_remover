@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright E2E test configuration for Cut It Out
+ * Playwright E2E test configuration for Backround Remover
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({

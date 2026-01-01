@@ -35,7 +35,7 @@ export const GitHubStarToast: React.FC<GitHubStarToastProps> = ({ show, onClose 
                 </div>
                 <div className="flex items-center gap-2">
                     <a
-                        href="https://github.com/Suvink/cut-it-out"
+                        href="https://github.com/zebbern/backround_remover"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="interactive-3d hover:scale-105 glass rounded-xl px-6 py-3 bg-lime-500 text-black text-xs font-bold hover:bg-lime-400 hover:border-lime-500/50 hover:shadow-glow transition-all duration-300"

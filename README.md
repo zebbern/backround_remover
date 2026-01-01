@@ -1,8 +1,8 @@
-# CutItOut - Free AI Background Remover
+# Backround Remover - Free AI Background Remover
 
-**CutItOut** is a free, open-source, and privacy-focused tool that removes image backgrounds instantly directly in your browser. Powered by WebAssembly and the U2-Net deep learning model, it ensures your images never leave your device.
+**Backround Remover** is a free, open-source, and privacy-focused tool that removes image backgrounds instantly directly in your browser. Powered by WebAssembly and the U2-Net deep learning model, it ensures your images never leave your device.
 
-![CutItOut Demo](/og-image.png)
+![Backround Remover Demo](/og-image.png)
 
 ## 🚀 Features
 
@@ -18,7 +18,7 @@
 
 ## 💻 Local Development
 
-Follow these steps to run CutItOut locally on your machine.
+Follow these steps to run Backround Remover locally on your machine.
 
 ### Prerequisites
 
@@ -29,8 +29,8 @@ Follow these steps to run CutItOut locally on your machine.
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/Suvink/cut-it-out.git
-    cd cut-it-out
+    git clone https://github.com/zebbern/backround_remover.git
+    cd backround_remover
     ```
 
 2.  **Install dependencies**

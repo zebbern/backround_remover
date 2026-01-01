@@ -1,8 +1,8 @@
 {
-  "name": "cut-it-out",
-  "description": "A browser bases background removal tool for images.",
-  "author": "Suvink",
-  "homepage": "https://cut-it-out.suvin.me",
+  "name": "backround-remover",
+  "description": "A browser based background removal tool for images.",
+  "author": "zebbern",
+  "homepage": "https://github.com/zebbern/backround_remover",
   "private": true,
   "version": "0.0.1",
   "type": "module",

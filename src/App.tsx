@@ -145,14 +145,14 @@ function App() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-zinc-100 via-lime-100 to-zinc-100 bg-clip-text text-transparent">
-                Cut It Out
+                Backround Remover
               </h1>
               <p className="text-zinc-400 mt-2 font-light tracking-wide">
                 AI-powered background removal
               </p>
             </div>
             <a
-              href="https://github.com/suvink/cut-it-out"
+              href="https://github.com/zebbern/backround_remover"
               target="_blank"
               rel="noopener noreferrer"
               className="glass-strong rounded-xl px-6 py-3 flex items-center gap-3 interactive-3d
