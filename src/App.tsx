@@ -169,37 +169,80 @@ function App() {
       <main className="max-w-7xl mx-auto px-4 py-8 min-h-[calc(100vh-8rem)] animate-fade-in-up" 
             style={{ animationDelay: '0.2s' }}>
         {!originalImage ? (
-          <div className="max-w-2xl mx-auto space-y-12 pt-12">
-            <div className="text-center space-y-4">
-              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
-                Remove Backgrounds <br />
-                <span className="text-lime-400">100% Automatically</span>
+          <div className="max-w-4xl mx-auto space-y-16 pt-16">
+            {/* Hero Section */}
+            <div className="text-center space-y-6">
+              <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight">
+                <span className="block bg-gradient-to-r from-white via-zinc-100 to-white bg-clip-text text-transparent">Remove Backgrounds</span>
+                <span className="block text-lime-400 mt-2">100% Automatically</span>
               </h1>
-              <p className="text-lg text-zinc-400 max-w-lg mx-auto">
-                Free, open-source, and runs entirely in your browser. No images are ever uploaded to a server.
+              <p className="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+                Free, open-source AI tool that runs entirely in your browser.
+                <span className="block text-zinc-500 mt-2 text-base">Your images never leave your device. Complete privacy guaranteed.</span>
               </p>
             </div>
 
-            <ImageUploader />
+            {/* Upload Area */}
+            <div className="max-w-2xl mx-auto">
+              <ImageUploader />
+            </div>
 
-            {/* Preload indicator - shows model is being prepared */}
+            {/* Preload indicator */}
             {isPreloading && (
-              <div className="glass rounded-xl px-4 py-2 text-sm text-zinc-400 shadow-glow mb-4">
+              <div className="glass rounded-xl px-4 py-2 text-sm text-zinc-400 shadow-glow text-center max-w-md mx-auto">
                 Loading AI model... {Math.round(preloadProgress)}%
               </div>
             )}
 
+            {/* Features Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8">
               {[
-                { title: 'Privacy First', desc: 'Images never leave your device' },
-                { title: 'AI Powered', desc: 'State-of-the-art U2-Net model' },
-                { title: 'Free Forever', desc: 'Open source and no hidden costs' }
+                { 
+                  title: '🔒 Privacy First', 
+                  desc: 'All processing happens locally in your browser',
+                  detail: 'Zero uploads, zero tracking'
+                },
+                { 
+                  title: '🤖 AI Powered', 
+                  desc: 'State-of-the-art U2-Net deep learning model',
+                  detail: 'Professional-grade results'
+                },
+                { 
+                  title: '✨ Free Forever', 
+                  desc: 'Open source with no hidden costs or limits',
+                  detail: 'Full resolution exports'
+                }
               ].map((item, i) => (
-                <div key={i} className="text-center p-4 rounded-lg bg-zinc-900 border border-zinc-800 shadow-sm">
-                  <h3 className="font-semibold text-zinc-100 mb-1">{item.title}</h3>
-                  <p className="text-sm text-zinc-500">{item.desc}</p>
+                <div 
+                  key={i} 
+                  className="glass-strong rounded-2xl p-6 shadow-glow hover:shadow-glow-strong transition-all duration-300 interactive-3d group"
+                >
+                  <h3 className="font-bold text-zinc-100 mb-2 text-lg group-hover:text-lime-400 transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-zinc-400 mb-1">{item.desc}</p>
+                  <p className="text-xs text-zinc-600">{item.detail}</p>
                 </div>
               ))}
+            </div>
+
+            {/* How It Works */}
+            <div className="glass rounded-2xl p-8 shadow-glow max-w-3xl mx-auto">
+              <h2 className="text-2xl font-bold text-center text-zinc-100 mb-6">How It Works</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {[
+                  { step: '1', text: 'Upload or paste your image' },
+                  { step: '2', text: 'AI removes background instantly' },
+                  { step: '3', text: 'Download or refine with tools' }
+                ].map((item, i) => (
+                  <div key={i} className="flex flex-col items-center text-center">
+                    <div className="w-12 h-12 rounded-full bg-lime-500/10 border border-lime-500/30 flex items-center justify-center mb-3">
+                      <span className="text-lime-400 font-bold text-lg">{item.step}</span>
+                    </div>
+                    <p className="text-sm text-zinc-400">{item.text}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         ) : (
