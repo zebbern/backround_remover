@@ -137,7 +137,7 @@ function App() {
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 py-8 min-h-[calc(100vh-8rem)] animate-fade-in-up flex items-center" 
+      <main className={`max-w-7xl mx-auto px-4 py-8 animate-fade-in-up ${!originalImage ? 'min-h-[calc(100vh-8rem)] flex items-center' : 'h-[calc(100vh-8rem)]'}`}
             style={{ animationDelay: '0.1s' }}>
         {!originalImage ? (
           <div className="max-w-3xl mx-auto space-y-12 w-full">
